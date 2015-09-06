@@ -10,20 +10,18 @@ namespace RappelzSniffer.Network
 {
 	public class Packets
 	{
-		public delegate void PacketAction(ref PacketStream stream, short[] pos);
+		public delegate void PacketAction(ref PacketStream stream);
 
 		public struct Packet
 		{
-			public int lenght;
 			public PacketAction func;
-			public short[] pos;
 		}
 
 		public static Dictionary<short, Packet> LoadAuthPackets()
 		{
 			Dictionary<short, Packet> packets_db = new Dictionary<short, Packet>();
 
-			packets_db.Add(0x2726, new Packet() { func = AuthPackets.send_ServerList, pos = new short[] { 0, 2, 4, 6, 28, 284, 300, 302, 304 } });
+			packets_db.Add(0x2726, new Packet() { func = AuthPackets.send_ServerList });
 			/*
 			// [0x270F] 9999 -> Unknown1 (Client)
 			packets_db.Add(0x270F, new Packet() { lenght = 11, func = AuthPackets.parse_Unknown1, pos = null });

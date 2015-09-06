@@ -25,9 +25,9 @@ namespace RappelzSniffer.Network
 
 		private BackgroundWorker bgWorker;
 
-		private Func<PacketStream, PacketStream> PacketFunc;
+		private Func<char, PacketStream, PacketStream> PacketFunc;
 
-		public Redirector(string serverIp, int serverPort, string clientIp, int clientPort, Func<PacketStream, PacketStream> pFun)
+		public Redirector(string serverIp, int serverPort, string clientIp, int clientPort, Func<char, PacketStream, PacketStream> pFun)
 		{
 			this.ServerIp = serverIp;
 			this.ServerPort = serverPort;
@@ -59,7 +59,7 @@ namespace RappelzSniffer.Network
 				listener.Listen(1);
 				listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
 
-				bgWorker.ReportProgress(0, "Initialized");
+				Form1.Log("Initialized");
 			}
 			catch (Exception e)
 			{
@@ -181,8 +181,8 @@ namespace RappelzSniffer.Network
 		// Client --> Redirector
 		private void PacketReceived(PacketStream data)
 		{
-			bgWorker.ReportProgress(0, "Packet received from client");
-			data = PacketFunc(data);
+			//bgWorker.ReportProgress(0, "Packet received from client");
+			data = PacketFunc('C', data);
 			SendServer(data);
 		}
 
@@ -208,7 +208,7 @@ namespace RappelzSniffer.Network
 		{
 			try
 			{
-				int bytesSent = Server.ClSocket.EndSend(ar);
+				int bytesSent = Client.ClSocket.EndSend(ar);
 				bgWorker.ReportProgress(0, "Packet sent to client");
 			}
 			catch (Exception e)
@@ -305,7 +305,7 @@ namespace RappelzSniffer.Network
 		private void ServerPacketReceived(PacketStream data)
 		{
 			bgWorker.ReportProgress(0, "Packet received from server");
-			data = PacketFunc(data);
+			data = PacketFunc('S', data);
 			Send(data);
 		}
 

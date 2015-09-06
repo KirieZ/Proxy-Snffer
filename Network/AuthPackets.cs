@@ -1,27 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utils;
 
 namespace RappelzSniffer.Network
 {
 	public static class AuthPackets
 	{
 		private static Dictionary<short, Packets.Packet> packet_db;
+		private static Dictionary<short, string> packet_names;
 
 		static AuthPackets()
 		{
 			packet_db = Packets.LoadAuthPackets();
+			LoadPacketNames();
 		}
 
-		internal static PacketStream PacketReceived(PacketStream stream)
+		static void LoadPacketNames()
+		{
+			packet_names = new Dictionary<short, string>();
+			if (File.Exists("packets/auth_packets.txt"))
+			{
+				string[] lines = File.ReadAllLines("packets/auth_packets.txt");
+
+				for (int i = 0; i < lines.Length; i++)
+				{
+					if (lines[i].StartsWith("//")) continue;
+					else if (!lines[i].Contains('=')) continue;
+
+					string[] val = lines[i].Split('=');
+					short id;
+					if (!short.TryParse(val[0].Trim(' '), out id))
+					{
+						// If can't convert from int, try Hex (0x)
+						try
+						{
+							id = (short)new System.ComponentModel.Int16Converter().ConvertFromString(val[0].Trim(' '));
+						}
+						catch (Exception)
+						{
+							continue;
+						}
+					}
+
+					if (!packet_names.ContainsKey(id))
+					{
+						packet_names.Add(id, val[1].TrimStart(' '));
+					}
+				}
+			}
+		}
+
+		internal static string GetPacketName(short id)
+		{
+			return (packet_names.ContainsKey(id) ? packet_names[id] : "Unknown");
+		}
+
+		internal static PacketStream PacketReceived(char src, PacketStream stream)
 		{
 			// Header
 			// [Size:4]
 			// [ID:2]
 			// [Checksum(?):1]
 			short PacketId = stream.GetId();
+			stream.ReadByte();
 
 			/*if (!packet_db.ContainsKey(PacketId))
 			{
@@ -36,59 +81,79 @@ namespace RappelzSniffer.Network
 				stream.GetSize()
 			);*/
 
-			if(packet_db.ContainsKey(PacketId))
-				packet_db[PacketId].func(ref stream, packet_db[PacketId].pos);
+			if (packet_db.ContainsKey(PacketId))
+				packet_db[PacketId].func(ref stream);
+			else
+			{
+				if (src == 'S')
+					Form1.PacketRecv('A', GetPacketName(PacketId), stream);
+				else
+					Form1.PacketSend('A', GetPacketName(PacketId), stream);
+			}
 
 			return stream;
 		}
 
-		internal static void send_ServerList(ref PacketStream data, short[] pos)
+		internal static void send_ServerList(ref PacketStream data)
 		{
-			// TODO: Check these values
-			//data.WriteInt16(1);
-			//data.WriteInt16(1); //servers.Length);
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(data.GetId()) + " [" + data.GetId() + "]");
+			data.ReadByte();
 
-			//
-			data.RewriteInt16(pos[6], Config.Game_ClientPort);
-			//foreach (GameServer sv in servers.Where(s => s != null))
-			//{
-				//data.WriteByte(sv.Index);
-				//data.WriteByte(0x00);
-				//data.WriteString(sv.Name, 21);
-				//data.WriteByte(0x00);
-				//data.WriteString(sv.NoticeUrl, 255);
-				//data.WriteByte(0x00);
-				//data.WriteString(sv.Ip.ToString(), 15);
-				//data.WriteByte(0x00);
-				//data.WriteInt16(sv.Port);
+			str.AppendLine("{");
+			str.AppendLine("	Int16 Unknown = " + data.ReadInt16());
+			short svCount = data.ReadInt16();
+			str.AppendLine("	Int16 ServerCount = " + svCount);
+			str.AppendLine("	struct Servers[ServerCount]");
+			str.AppendLine("	{");
+			
+			for (int i = 0; i < svCount; i++)
+			{
+				str.AppendLine("		{");
+				str.AppendLine("			Int16 Index = " + data.ReadInt16());
+				str.AppendLine("			String(22) Name = " + data.ReadString(0, 22));
+				str.AppendLine("			String(256) URL = " + data.ReadString(0, 256));
+				str.AppendLine("			String(16) IP = " + data.ReadString(0, 16));
+				str.AppendLine("			Int16 Port = " + data.ReadInt16());
+				str.AppendLine("			Int16 Unknown = " + data.ReadInt16());
+				str.AppendLine("			Int16 Unknown = " + data.ReadInt16());
+				str.AppendLine("		}");
+			}
 
-				//data.WriteInt16(0); // Server Status
-				//data.WriteInt16(0);
-			//}
+			str.AppendLine("	}");
+			str.AppendLine("}");
 
-			//ClientManager.Instance.Send(client, data);
+			data.RewriteInt16(300, Config.Game_ClientPort);
+
+			Form1.PacketRecv('A', GetPacketName(data.GetId()), data, str.ToString());
 		}
 		
-		/*
 		#region Parse Packet
 		
 		/// [0x270F] 9999 -> (CA) Unknown1
-		internal static void parse_Unknown1(ref PacketStream pStream, short[] pos) { return; }
+		internal static void parse_Unknown1(ref PacketStream pStream) { return; }
 
 		/// [0x2711] 10001 -> (CA) Client Version
 		/// <version>.20S
-		internal static void parse_ClientVersion(ref PacketStream pStream, short[] pos) { return; }
+		internal static void parse_ClientVersion(ref PacketStream pStream) { return; }
 
 		/// [0x271A] 10010 -> (CA) Login
 		/// <username>.60S <password>.8B
-		internal static void parse_LoginTry(ref PacketStream pStream, short[] pos)
+		internal static void parse_LoginTry(ref PacketStream pStream)
 		{
-			string user_id = ByteUtils.toString(pStream.ReadBytes((pos[0]), 60));
-			string password = Des.Decrypt(pStream.ReadBytes((pos[1]), 8)).Trim('\0');
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
 
-			client.TryLogin(user_id, password);
+			str.AppendLine("{");
+			str.AppendLine("	String UserID = " + pStream.ReadString(0, 60));
+			str.AppendLine("	String UserPass = " + pStream.ReadString(0, 8));
+			str.AppendLine("}");
+
+			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
-
+		
+		/*
 		/// [0x2725] 10021 -> (CA) Request Server List
 		internal static void parse_RequestServerList(ref PacketStream pStream, short[] pos)
 		{
@@ -159,8 +224,7 @@ namespace RappelzSniffer.Network
 
 			ClientManager.Instance.Send(client, data);
 		}
-
-		#endregion
 		*/
+		#endregion
 	}
 }

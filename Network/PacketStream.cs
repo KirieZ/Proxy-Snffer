@@ -126,85 +126,99 @@ namespace RappelzSniffer.Network
 			return buffer;
 		}
 
-		public Int16 ReadInt16(int offset, bool countHeader = false)
+		public Int16 ReadInt16(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[2];
 			inner.Read(buffer, 0, 2);
 			return BitConverter.ToInt16(buffer, 0);
 		}
 
-		public UInt16 ReadUInt16(int offset, bool countHeader = false)
+		public UInt16 ReadUInt16(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[2];
 			inner.Read(buffer, 0, 2);
 			return BitConverter.ToUInt16(buffer, 0);
 		}
 
-		public Int32 ReadInt32(int offset, bool countHeader = false)
+		public Int32 ReadInt32(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[4];
 			inner.Read(buffer, 0, 4);
 			return BitConverter.ToInt32(buffer, 0);
 		}
 
-		public UInt32 ReadUInt32(int offset, bool countHeader = false)
+		public UInt32 ReadUInt32(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[4];
 			inner.Read(buffer, 0, 4);
 			return BitConverter.ToUInt32(buffer, 0);
 		}
 
-		public Int64 ReadInt64(int offset, bool countHeader = false)
+		public Int64 ReadInt64(int offset=0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[8];
 			inner.Read(buffer, 0, 8);
 			return BitConverter.ToInt64(buffer, 0);
 		}
 
-		public UInt64 ReadUInt64(int offset, bool countHeader = false)
+		public UInt64 ReadUInt64(int offset=0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[8];
 			inner.Read(buffer, 0, 8);
 			return BitConverter.ToUInt64(buffer, 0);
 		}
 
-		public Single ReadFloat(int offset, bool countHeader = false)
+		public Single ReadFloat(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[4];
 			inner.Read(buffer, 0, 4);
 			return BitConverter.ToSingle(buffer, 0);
@@ -212,34 +226,40 @@ namespace RappelzSniffer.Network
 
 		public String ReadString(int offset, int size, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			byte[] buffer = new byte[size];
 			inner.Read(buffer, 0, size);
 
 			return ByteUtils.toString(buffer);
 		}
 
-		public bool ReadBool(int offset, bool countHeader = false)
+		public bool ReadBool(int offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			return (inner.ReadByte() == 0 ? false : true);
 		}
 
-		internal byte ReadByte(short offset, bool countHeader = false)
+		internal byte ReadByte(short offset = 0, bool countHeader = false)
 		{
-			if (countHeader)
-				inner.Seek(offset, SeekOrigin.Begin);
-			else
-				inner.Seek(offset + 7, SeekOrigin.Begin);
-
+			if (offset > 0)
+			{
+				if (countHeader)
+					inner.Seek(offset, SeekOrigin.Begin);
+				else
+					inner.Seek(offset + 7, SeekOrigin.Begin);
+			}
 			return (byte)inner.ReadByte();
 		}
 		#endregion
