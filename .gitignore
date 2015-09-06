@@ -1,0 +1,8 @@
+# Binaries
+/obj
+/bin
+
+# Temporary
+*.suo
+*.tmp
+*.user
