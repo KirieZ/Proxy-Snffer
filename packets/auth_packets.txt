@@ -1,0 +1,11 @@
+// ======= Auth
+// Client - Send
+0x270F = TODO
+0x2711 = Version
+0x271A = Login
+0x2725 = Server List Request
+0x2727 = Join Game Server
+// Client - Recv
+0x2710 = Login Result
+0x2726 = Server List
+0x2728 = Login Token

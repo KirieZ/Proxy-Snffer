@@ -64,8 +64,10 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x011F, new Packet() { func = GamePackets.parse_WearChange });
 
 			packets_db.Add(0x0192, new Packet() { func = GamePackets.parse_LearnSkill });
-			packets_db.Add(0x0193, new Packet() { func = GamePackets.send_SkillCooldown });
-
+			packets_db.Add(0x0193, new Packet() { func = GamePackets.send_SkillList });
+			
+			packets_db.Add(0x019A, new Packet() { func = GamePackets.parse_JobLevelUp });
+			
 			packets_db.Add(0x01F4, new Packet() { func = GamePackets.send_EntityState });
 			packets_db.Add(0x01FB, new Packet() { func = GamePackets.send_Property });
 			packets_db.Add(0x01FC, new Packet() { func = GamePackets.parse_SetProperty });

@@ -461,7 +461,20 @@ namespace RappelzSniffer.Network
 
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
+		
+		internal static void parse_JobLevelUp(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
 
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+		
 		//========== Send
 
 		internal static void send_PacketResponse(ref PacketStream stream)
@@ -571,8 +584,8 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("{");
 			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 unknown1 = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 unknown2 = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 hp_recover = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 mp_recover = " + stream.ReadUInt32());
 			str.AppendLine("	UInt32 new_hp = " + stream.ReadUInt32());
 			str.AppendLine("	UInt32 new_mp = " + stream.ReadUInt32());
 			str.AppendLine("}");
@@ -646,60 +659,64 @@ namespace RappelzSniffer.Network
 			str.AppendLine("{");
 			str.AppendLine("	Int16 unknown = " + stream.ReadInt16());
 			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("	Int16 char_count = " + stream.ReadInt16());	/* 6 */
+			short count = stream.ReadInt16();
+			str.AppendLine("	Int16 char_count = " + count);	/* 6 */
 			str.AppendLine("	struct character[char_count]");
 			str.AppendLine("	{");
-			str.AppendLine("		{");
-			str.AppendLine("			Int32 sex = " + stream.ReadInt32());				/* 8 */
-			str.AppendLine("			Int32 race = " + stream.ReadInt32());				/* 12 */
-			str.AppendLine("			Int32 model00 = " + stream.ReadInt32());			/* 16 */
-			str.AppendLine("			Int32 model01 = " + stream.ReadInt32());			/* 20 */
-			str.AppendLine("			Int32 model02 = " + stream.ReadInt32());			/* 24 */
-			str.AppendLine("			Int32 model03 = " + stream.ReadInt32());			/* 28 */
-			str.AppendLine("			Int32 model04 = " + stream.ReadInt32());			/* 32 */
-			str.AppendLine("			Int32 hair_color = " + stream.ReadInt32());		/* 36 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 40 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 44 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 48 */
-			str.AppendLine("			Int32 right_hand = " + stream.ReadInt32());		/* 52 */
-			str.AppendLine("			Int32 left_hand = " + stream.ReadInt32());		/* 54 */
-			str.AppendLine("			Int32 armor_id = " + stream.ReadInt32());			/* 58 */
-			str.AppendLine("			Int32 cap_id = " + stream.ReadInt32());			/* 62 */
-			str.AppendLine("			Int32 hand_id = " + stream.ReadInt32()); 			/* 66 */
-			str.AppendLine("			Int32 feet_id = " + stream.ReadInt32());			/* 70 */
-			str.AppendLine("			Int32 belt_id = " + stream.ReadInt32());			/* 74 */
-			str.AppendLine("			Int32 cape_id = " + stream.ReadInt32());			/* 78 */
-			str.AppendLine("			Int32 necklace_id = " + stream.ReadInt32());		/* 82 */
-			str.AppendLine("			Int32 ring1 = " + stream.ReadInt32());			/* 86 */
-			str.AppendLine("			Int32 ring2 = " + stream.ReadInt32());			/* 90 */
-			str.AppendLine("			Int32 earring = " + stream.ReadInt32());			/* 94 */
-			str.AppendLine("			Int32 mask_id = " + stream.ReadInt32());			/* 98 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 102 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 106 */
-			str.AppendLine("			Int32 deco_shield_id = " + stream.ReadInt32());	/* 110 */
-			str.AppendLine("			Int32 deco_costume_id = " + stream.ReadInt32());	/* 114 */
-			str.AppendLine("			Int32 deco_head_id = " + stream.ReadInt32());		/* 118 */
-			str.AppendLine("			Int32 deco_gloves_id = " + stream.ReadInt32());	/* 122 */
-			str.AppendLine("			Int32 deco_shoes_id = " + stream.ReadInt32());	/* 126 */
-			str.AppendLine("			Int32 deco_cloak_id = " + stream.ReadInt32());	/* 130 */
-			str.AppendLine("			Int32 deco_bag_id = " + stream.ReadInt32());		/* 134 */
-			str.AppendLine("			Int32 mount_id = " + stream.ReadInt32());			/* 138 */
-			str.AppendLine("			Int32 bag_id = " + stream.ReadInt32());			/* 142 */
-			str.AppendLine("			Int32 level = " + stream.ReadInt32());			/* 146 */
-			str.AppendLine("			Int32 job = " + stream.ReadInt32());				/* 150 */
-			str.AppendLine("			Int32 job_level = " + stream.ReadInt32());		/* 154 */
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("			Byte unknown = " + stream.ReadByte());
-			str.AppendLine("			String(19) char_name = " + stream.ReadString(0, 19));	/* 175 */
-			str.AppendLine("			Int32 skin_color = " + stream.ReadInt32());		/* 194 */
-			str.AppendLine("			String(30) create_date = " + stream.ReadString(0, 30));	/* 198 */
-			str.AppendLine("			String(30) delete_date = " + stream.ReadString(0, 30));
-			for (int i = 0; i < 312; i += 4)
+			for (int i = 0; i < count; i++)
+			{
+				str.AppendLine("		{");
+				str.AppendLine("			Int32 sex = " + stream.ReadInt32());				/* 8 */
+				str.AppendLine("			Int32 race = " + stream.ReadInt32());				/* 12 */
+				str.AppendLine("			Int32 model00 = " + stream.ReadInt32());			/* 16 */
+				str.AppendLine("			Int32 model01 = " + stream.ReadInt32());			/* 20 */
+				str.AppendLine("			Int32 model02 = " + stream.ReadInt32());			/* 24 */
+				str.AppendLine("			Int32 model03 = " + stream.ReadInt32());			/* 28 */
+				str.AppendLine("			Int32 model04 = " + stream.ReadInt32());			/* 32 */
+				str.AppendLine("			Int32 hair_color = " + stream.ReadInt32());		/* 36 */
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 40 */
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 44 */
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 48 */
+				str.AppendLine("			Int32 right_hand = " + stream.ReadInt32());		/* 52 */
+				str.AppendLine("			Int32 left_hand = " + stream.ReadInt32());		/* 54 */
+				str.AppendLine("			Int32 armor_id = " + stream.ReadInt32());			/* 58 */
+				str.AppendLine("			Int32 cap_id = " + stream.ReadInt32());			/* 62 */
+				str.AppendLine("			Int32 hand_id = " + stream.ReadInt32()); 			/* 66 */
+				str.AppendLine("			Int32 feet_id = " + stream.ReadInt32());			/* 70 */
+				str.AppendLine("			Int32 belt_id = " + stream.ReadInt32());			/* 74 */
+				str.AppendLine("			Int32 cape_id = " + stream.ReadInt32());			/* 78 */
+				str.AppendLine("			Int32 necklace_id = " + stream.ReadInt32());		/* 82 */
+				str.AppendLine("			Int32 ring1 = " + stream.ReadInt32());			/* 86 */
+				str.AppendLine("			Int32 ring2 = " + stream.ReadInt32());			/* 90 */
+				str.AppendLine("			Int32 earring = " + stream.ReadInt32());			/* 94 */
+				str.AppendLine("			Int32 mask_id = " + stream.ReadInt32());			/* 98 */
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 102 */
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 106 */
+				str.AppendLine("			Int32 deco_shield_id = " + stream.ReadInt32());	/* 110 */
+				str.AppendLine("			Int32 deco_costume_id = " + stream.ReadInt32());	/* 114 */
+				str.AppendLine("			Int32 deco_head_id = " + stream.ReadInt32());		/* 118 */
+				str.AppendLine("			Int32 deco_gloves_id = " + stream.ReadInt32());	/* 122 */
+				str.AppendLine("			Int32 deco_shoes_id = " + stream.ReadInt32());	/* 126 */
+				str.AppendLine("			Int32 deco_cloak_id = " + stream.ReadInt32());	/* 130 */
+				str.AppendLine("			Int32 deco_bag_id = " + stream.ReadInt32());		/* 134 */
+				str.AppendLine("			Int32 mount_id = " + stream.ReadInt32());			/* 138 */
+				str.AppendLine("			Int32 bag_id = " + stream.ReadInt32());			/* 142 */
+				str.AppendLine("			Int32 level = " + stream.ReadInt32());			/* 146 */
+				str.AppendLine("			Int32 job = " + stream.ReadInt32());				/* 150 */
+				str.AppendLine("			Int32 job_level = " + stream.ReadInt32());		/* 154 */
 				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("		}");
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("			Byte unknown = " + stream.ReadByte());
+				str.AppendLine("			String(19) char_name = " + stream.ReadString(0, 19));	/* 175 */
+				str.AppendLine("			Int32 skin_color = " + stream.ReadInt32());		/* 194 */
+				str.AppendLine("			String(30) create_date = " + stream.ReadString(0, 30));	/* 198 */
+				str.AppendLine("			String(30) delete_date = " + stream.ReadString(0, 30));
+				for (int i = 0; i < 312; i += 4)
+					str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("		}");
+			}
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
@@ -783,7 +800,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_SkillCooldown(ref PacketStream stream)
+		internal static void send_SkillList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -791,12 +808,22 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("{");
 			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
-			str.AppendLine("	Int16 skill_level = " + stream.ReadInt16());
+			short count = stream.ReadInt16();
+			str.AppendLine("	Int16 count = " + count);
 			str.AppendLine("	Byte unknown = " + stream.ReadByte());
-			str.AppendLine("	Int32 skill_id = " + stream.ReadInt32());
-			str.AppendLine("	Byte unknown = " + stream.ReadByte());
-			str.AppendLine("	Byte unknown = " + stream.ReadByte());
-			str.AppendLine("	Int64 cooldown = " + stream.ReadInt64());
+			str.AppendLine("	struct skill_info[count]");
+			str.AppendLine("	{");
+			for (int i = 0; i < count; i++)
+			{
+				str.AppendLine("		{");
+				str.AppendLine("			Int32 skill_id = " + stream.ReadInt32());
+				str.AppendLine("			Byte skill_lv = " + stream.ReadByte());
+				str.AppendLine("			Byte skill_lv = " + stream.ReadByte());
+				str.AppendLine("			UInt32 cooldown = " + stream.ReadInt32());
+				str.AppendLine("			UInt32 unknown = " + stream.ReadInt32());
+				str.AppendLine("		}");
+			}
+			str.AppendLine("	}");
 			str.AppendLine("}");
 
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
