@@ -63,7 +63,7 @@ namespace RappelzSniffer.Network
 			}
 			catch (Exception e)
 			{
-				bgWorker.ReportProgress(0, e.Message.ToString());
+				Form1.Log(e.Message);
 				allDone.Set();
 			}
 
@@ -209,7 +209,7 @@ namespace RappelzSniffer.Network
 			try
 			{
 				int bytesSent = Client.ClSocket.EndSend(ar);
-				bgWorker.ReportProgress(0, "Packet sent to client");
+				//bgWorker.ReportProgress(0, "Packet sent to client");
 			}
 			catch (Exception e)
 			{
@@ -224,73 +224,76 @@ namespace RappelzSniffer.Network
 		// Server --> Redirector
 		private void ServerReadCallback(IAsyncResult ar)
 		{
-			//try
-			//{
-			// Read data from the client socket. 
-			int bytesRead = Server.ClSocket.EndReceive(ar);
-			if (bytesRead > 0)
+			try
 			{
-				byte[] decode = Server.Decoder.DoCipher(ref Server.Buffer, bytesRead);
-				int curOffset = 0;
-				int bytesToRead = 0;
-
-				do
+				// Read data from the client socket. 
+				int bytesRead = Server.ClSocket.EndReceive(ar);
+				if (bytesRead > 0)
 				{
-					if (Server.PacketSize == 0)
+					byte[] decode = Server.Decoder.DoCipher(ref Server.Buffer, bytesRead);
+					int curOffset = 0;
+					int bytesToRead = 0;
+
+					do
 					{
-						if (Server.Offset + bytesRead > 3)
+						if (Server.PacketSize == 0)
 						{
-							bytesToRead = (4 - Server.Offset);
-							Server.Data.Write(decode, curOffset, bytesToRead);
-							curOffset += bytesToRead;
-							Server.Offset = bytesToRead;
-							Server.PacketSize = BitConverter.ToInt32(Server.Data.ReadBytes(0, 4, true), 0);
+							if (Server.Offset + bytesRead > 3)
+							{
+								bytesToRead = (4 - Server.Offset);
+								Server.Data.Write(decode, curOffset, bytesToRead);
+								curOffset += bytesToRead;
+								Server.Offset = bytesToRead;
+								Server.PacketSize = BitConverter.ToInt32(Server.Data.ReadBytes(0, 4, true), 0);
+							}
+							else
+							{
+								Server.Data.Write(decode, 0, bytesRead);
+								Server.Offset += bytesRead;
+								curOffset += bytesRead;
+							}
 						}
 						else
 						{
-							Server.Data.Write(decode, 0, bytesRead);
-							Server.Offset += bytesRead;
-							curOffset += bytesRead;
-						}
-					}
-					else
-					{
-						int needBytes = Server.PacketSize - Server.Offset;
+							int needBytes = Server.PacketSize - Server.Offset;
 
-						// If there's enough bytes to complete this packet
-						if (needBytes <= (bytesRead - curOffset))
-						{
-							Server.Data.Write(decode, curOffset, needBytes);
-							curOffset += needBytes;
-							// Packet is done, send to server to be parsed
-							// and continue.
-							ServerPacketReceived(Server.Data);
-							// Do needed clean up to start a new packet
-							Server.Data = new PacketStream();
-							Server.PacketSize = 0;
-							Server.Offset = 0;
+							// If there's enough bytes to complete this packet
+							if (needBytes <= (bytesRead - curOffset))
+							{
+								Server.Data.Write(decode, curOffset, needBytes);
+								curOffset += needBytes;
+								// Packet is done, send to server to be parsed
+								// and continue.
+								ServerPacketReceived(Server.Data);
+								// Do needed clean up to start a new packet
+								Server.Data = new PacketStream();
+								Server.PacketSize = 0;
+								Server.Offset = 0;
+							}
+							else
+							{
+								bytesToRead = (bytesRead - curOffset);
+								Server.Data.Write(decode, curOffset, bytesToRead);
+								Server.Offset += bytesToRead;
+								curOffset += bytesToRead;
+							}
 						}
-						else
-						{
-							bytesToRead = (bytesRead - curOffset);
-							Server.Data.Write(decode, curOffset, bytesToRead);
-							Server.Offset += bytesToRead;
-							curOffset += bytesToRead;
-						}
-					}
-				} while (bytesRead - 1 > curOffset);
+					} while (bytesRead - 1 > curOffset);
 
+				}
+				else
+				{
+					//ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
+					return;
+				}
 			}
-			else
+			catch (SocketException e)
 			{
-				//ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
+				Form1.Log("Connection lost.");
+				Form1.Log(e.Message);
+				allDone.Set();
 				return;
 			}
-			/*}
-			catch (Exception e)
-			{
-				ConsoleUtils.Write(MSG_TYPE.Info, "User disconected. " + e.Message);
-			}*/
 			Server.ClSocket.BeginReceive(
 				Server.Buffer,
 				0,
@@ -304,7 +307,7 @@ namespace RappelzSniffer.Network
 		// Server --> Redirector
 		private void ServerPacketReceived(PacketStream data)
 		{
-			bgWorker.ReportProgress(0, "Packet received from server");
+			//bgWorker.ReportProgress(0, "Packet received from server");
 			data = PacketFunc('S', data);
 			Send(data);
 		}
@@ -331,7 +334,7 @@ namespace RappelzSniffer.Network
 			try
 			{
 				int bytesSent = Server.ClSocket.EndSend(ar);
-				bgWorker.ReportProgress(0, "Packet sent to server");
+				//bgWorker.ReportProgress(0, "Packet sent to server");
 			}
 			catch (Exception e)
 			{

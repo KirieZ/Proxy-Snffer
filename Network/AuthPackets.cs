@@ -131,11 +131,33 @@ namespace RappelzSniffer.Network
 		#region Parse Packet
 		
 		/// [0x270F] 9999 -> (CA) Unknown1
-		internal static void parse_Unknown1(ref PacketStream pStream) { return; }
+		internal static void parse_Unknown1(ref PacketStream pStream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	????");
+			str.AppendLine("}");
+
+			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+		}
 
 		/// [0x2711] 10001 -> (CA) Client Version
 		/// <version>.20S
-		internal static void parse_ClientVersion(ref PacketStream pStream) { return; }
+		internal static void parse_ClientVersion(ref PacketStream pStream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(20) Version = " + pStream.ReadString(0, 20));
+			str.AppendLine("}");
+
+			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+		}
 
 		/// [0x271A] 10010 -> (CA) Login
 		/// <username>.60S <password>.8B
@@ -150,22 +172,36 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String UserPass = " + pStream.ReadString(0, 8));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
 		
-		/*
+		
 		/// [0x2725] 10021 -> (CA) Request Server List
-		internal static void parse_RequestServerList(ref PacketStream pStream, short[] pos)
+		internal static void parse_RequestServerList(ref PacketStream pStream)
 		{
-			Server.OnUserRequestServerList(client);
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("}");
+
+			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
 
 		/// [0x2726] 10023 -> (CA) Request Game Server Connection
 		/// <server index>.W
-		internal static void parse_JoinGameServer(ref PacketStream pStream, short[] pos)
+		internal static void parse_JoinGameServer(ref PacketStream pStream)
 		{
-			byte server_index = pStream.ReadByte(pos[0]);
-			Server.OnUserJoinGame(client, server_index);
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int16 index = " + pStream.ReadInt16());
+			str.AppendLine("}");
+
+			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
 
 		#endregion
@@ -174,57 +210,41 @@ namespace RappelzSniffer.Network
 
 		/// [0x2710] 10000 -> (AC) Login Result
 		/// <packet id>.W <result>.W <0>.L
-		internal static void send_LoginResult(Client client, Packets.LoginResult result)
+		internal static void send_LoginResult(ref PacketStream pStream)
 		{
-			PacketStream data = new PacketStream((short)0x2710);
-			data.WriteInt16(0x271A);
-			data.WriteInt16((short)result);
-			data.WriteInt32(0);
-			ClientManager.Instance.Send(client, data);
-		}
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
 
-		/// [0x2726] 10022 -> (AC) Server List
-		/// <unknown>.W <servers count>.W 
-		/// { <index>.W <name>.22S <notice url>.256S <ip>.16S 
-		///   <port>.W <status>.W <unknown2>.W}*(server count)
-		internal static void send_ServerList(Client client, GameServer[] servers)
-		{
-			PacketStream data = new PacketStream((short)0x2726);
-			// TODO: Check these values
-			data.WriteInt16(1);
-			data.WriteInt16(1); //servers.Length);
+			str.AppendLine("{");
+			str.AppendLine("	Int16 PacketId = " + pStream.ReadInt16());
+			str.AppendLine("	Int16 Result = " + pStream.ReadInt16());
+			str.AppendLine("	Int32 Unknown = " + pStream.ReadInt32());
+			str.AppendLine("}");
 
-			foreach (GameServer sv in servers.Where(s => s != null))
-			{
-				data.WriteByte(sv.Index);
-				data.WriteByte(0x00);
-				data.WriteString(sv.Name, 21);
-				data.WriteByte(0x00);
-				data.WriteString(sv.NoticeUrl, 255);
-				data.WriteByte(0x00);
-				data.WriteString(sv.Ip.ToString(), 15);
-				data.WriteByte(0x00);
-				data.WriteInt16(sv.Port);
-
-				data.WriteInt16(0); // Server Status
-				data.WriteInt16(0);
-			}
-
-			ClientManager.Instance.Send(client, data);
+			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
 
 		/// [0x2728] 10024 -> (AC) Join Game (Login Token)
 		/// <unknown>.W <key>.8B <0A 00 00 00>.L
-		internal static void send_JoinGame(Client client, byte[] key)
+		internal static void send_JoinGame(ref PacketStream pStream)
 		{
-			PacketStream data = new PacketStream((short)0x2728);
-			data.WriteInt16(0);
-			data.Write(key, 0, 8);
-			data.WriteInt32(10);
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
+			pStream.ReadByte();
 
-			ClientManager.Instance.Send(client, data);
+			str.AppendLine("{");
+			str.AppendLine("	Int16 Unknown = " + pStream.ReadInt16());
+			str.Append	  ("	byte[8] = ");
+			for (int i = 0; i < 8; i++)
+				str.Append(pStream.ReadByte() + " ");
+			str.Append("\r\n");
+			str.AppendLine("	Int32 Unknown = " + pStream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
 		}
-		*/
+		
 		#endregion
 	}
 }
