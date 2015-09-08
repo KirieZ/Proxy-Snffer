@@ -11,6 +11,7 @@ namespace RappelzSniffer.Network
 	{
 		private static Dictionary<short, Packets.Packet> packet_db;
 		private static Dictionary<short, string> packet_names;
+		private static char Src = ' ';
 
 		static GamePackets()
 		{
@@ -60,6 +61,7 @@ namespace RappelzSniffer.Network
 
 		internal static PacketStream PacketReceived(char src, PacketStream stream)
 		{
+			Src = src;
 			// Header
 			// [Size:4]
 			// [ID:2]
@@ -713,7 +715,7 @@ namespace RappelzSniffer.Network
 				str.AppendLine("			Int32 skin_color = " + stream.ReadInt32());		/* 194 */
 				str.AppendLine("			String(30) create_date = " + stream.ReadString(0, 30));	/* 198 */
 				str.AppendLine("			String(30) delete_date = " + stream.ReadString(0, 30));
-				for (int i = 0; i < 312; i += 4)
+				for (int j = 0; j < 312; j += 4)
 					str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
 				str.AppendLine("		}");
 			}
@@ -824,6 +826,462 @@ namespace RappelzSniffer.Network
 				str.AppendLine("		}");
 			}
 			str.AppendLine("	}");
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void packet2(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			//str.AppendLine("	2B unknown = " + unk1);
+			str.AppendLine("}");
+
+			if (Src == 'S')
+				Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream);
+			else
+				Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_ClientVersion(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_1F7(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 = " + stream.ReadUInt32());
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_226(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_384(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_44C(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_SystemSpecs(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(86) Specs = " + stream.ReadString(0, 86));
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void parse_270F(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
+			str.AppendLine("}");
+
+			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+		}
+
+		internal static void send_LoginResult(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int16 result = " + stream.ReadInt16());
+			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	float x = " + stream.ReadFloat());
+			str.AppendLine("	float y = " + stream.ReadFloat());
+			str.AppendLine("	float z = " + stream.ReadFloat());
+			str.AppendLine("	Byte layer = " + stream.ReadByte());
+			str.AppendLine("	float face = " + stream.ReadFloat());
+			str.AppendLine("	Int32 region_size = " + stream.ReadInt32());
+			str.AppendLine("	Int32 hp = " + stream.ReadInt32());
+			str.AppendLine("	Int32 mp = " + stream.ReadInt32());
+			str.AppendLine("	Int32 max_hp = " + stream.ReadInt32());
+			str.AppendLine("	Int32 max_mp = " + stream.ReadInt32());
+			str.AppendLine("	Int32 havoc = " + stream.ReadInt32());
+			str.AppendLine("	Int32 max_havoc = " + stream.ReadInt32());
+			str.AppendLine("	Int32 sex = " + stream.ReadInt32());
+			str.AppendLine("	Int32 race = " + stream.ReadInt32());
+			str.AppendLine("	Int32 skin_color = " + stream.ReadInt32());
+			str.AppendLine("	Int32 face_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 hair_id = " + stream.ReadInt32());
+			str.AppendLine("	string(19) char_name = " + stream.ReadString(0, 19));
+			str.AppendLine("	Int32 cell_size = " + stream.ReadInt32());
+			str.AppendLine("	Int32 guild_id = " + stream.ReadInt32());
+
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_A(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 unknown = " + stream.ReadUInt32());
+
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void parse_Scripts(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	String(21) msg_type = " + stream.ReadString(0, 21));
+			short size = stream.ReadInt16();
+			str.AppendLine("	Int16 size = " + size);
+			str.AppendLine("	String(size) = " + stream.ReadString(0, size));
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_37(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		
+		}
+
+		internal static void send_CharView(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int32 player_handle = " + stream.ReadInt32());
+			str.AppendLine("	Int32 weapon_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 shield_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 armor_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 cap_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 hand_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 feet_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 belt_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 cape_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 necklace_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 ring1 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 ring2 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 earring = " + stream.ReadInt32());
+			str.AppendLine("	Int32 mask_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
+			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_shield_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_costume_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_head_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_gloves_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_shoes_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_cloak_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 deco_bag_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 mount_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 bag_id = " + stream.ReadInt32());
+			for (int i = 0; i < 312; i += 4)
+			{
+				str.Append("	4B Unknown = " + stream.ReadInt32());
+			}
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_InventoryList(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			short count = stream.ReadInt16();
+			str.AppendLine("	Int16 count = " + count);
+			str.AppendLine("	struct Item[count]");
+			str.AppendLine("	{");
+			for (int i = 0; i < count; i++)
+			{
+				str.AppendLine("		{");
+				str.AppendLine("			UInt32 item_handle = " + stream.ReadUInt32());
+				str.AppendLine("			Int32 item_id = " + stream.ReadInt32());
+				str.AppendLine("			Int64 item_uid = " + stream.ReadInt64());
+				str.AppendLine("			Int64 count = " + stream.ReadInt64());
+				str.AppendLine("			4B unknown = " + stream.ReadInt32());
+				str.AppendLine("			4B unknown = " + stream.ReadInt32());
+				str.AppendLine("			Byte enhance = " + stream.ReadByte());
+				str.AppendLine("			Byte level = " + stream.ReadByte());
+				str.AppendLine("			1B unknown = " + stream.ReadByte());
+				for (int j = 0; j < 80; j+=4)
+					str.AppendLine("			4B unknown = " + stream.ReadInt32());
+				str.AppendLine("			Int32 wear_info = " + stream.ReadInt32());
+				str.AppendLine("			Int16 unknown // 0 = " + stream.ReadInt16());
+				str.AppendLine("			Int32 idx = " + stream.ReadInt32());
+				str.AppendLine("		}");
+			}
+
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_BeltSlotInfo(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 slot0_handle = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 slot1_handle = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 slot2_handle = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 slot3_handle = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 slot4_handle = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 slot5_handle = " + stream.ReadUInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		
+		}
+
+		internal static void send_194(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	2B unknown = " + stream.ReadInt16());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		
+		}
+
+		internal static void send_QuestList(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			int count = stream.ReadInt32();
+			str.AppendLine("	Int32 count = " + count);
+			str.AppendLine("	struct Quest[count]");
+			str.AppendLine("	{");
+			for (int j = 0; j < count; j++)
+			{
+				str.AppendLine("		{");
+				str.AppendLine("			Int32 quest_id = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status1 = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status2 = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status3 = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status4 = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status5 = " + stream.ReadInt32());
+				str.AppendLine("			Int32 status6 = " + stream.ReadInt32());
+				str.Append("			23B unknown = ");
+				for (int i = 0; i < 23; i++)
+					str.Append(stream.ReadByte() + " ");
+				str.Append("\r\n");
+				str.AppendLine("			Byte progress = " + stream.ReadByte());
+				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("		}");
+			}
+			str.AppendLine("	}");
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_QuestUpdate(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int32 quest_id = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status1 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status2 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status3 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status4 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status5 = " + stream.ReadInt32());
+			str.AppendLine("	Int32 status6 = " + stream.ReadInt32());
+			str.AppendLine("	Byte progress = " + stream.ReadByte());
+			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		
+		}
+
+		internal static void send_LocationInfo(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int32 old_location = " + stream.ReadInt32());
+			str.AppendLine("	Int32 new_location = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_WeatherInfo(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int32 local_id = " + stream.ReadInt32());
+			str.AppendLine("	Int16 Weather = " + stream.ReadInt16());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_UpdateGoldChaos(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int64 gold = " + stream.ReadInt64());
+			str.AppendLine("	Int32 chaos = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_UpdateLevel(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	Int32 level = " + stream.ReadInt32());
+			str.AppendLine("	Int32 job_level = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_UpdateExp(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	Int64 char_exp = " + stream.ReadInt64());
+			str.AppendLine("	Int64 jp = " + stream.ReadInt64());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_GameTime(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	Int32 start_time = " + stream.ReadInt32());
+			str.AppendLine("	Int64 unix_timestamp = " + stream.ReadInt64());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
+
+		internal static void send_OpenPopup(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.Append("	11B unknown = ");
+			for (int i = 0; i < 11; i++)
+				str.Append(stream.ReadByte() + " ");
+			str.Append("\r\n");
+			str.AppendLine("	String url = " + stream.ReadString(0, stream.GetSize() - 18));
 			str.AppendLine("}");
 
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
