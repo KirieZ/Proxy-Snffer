@@ -8,7 +8,7 @@ namespace RappelzSniffer
 {
 	public static class Config
 	{
-		public const int MaxBuffer = 1024;
+		public const int MaxBuffer = 2048;
 		public const int HeaderLength = 7;
 
 		public static string Auth_ServerIp = "127.0.0.1";

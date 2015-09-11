@@ -14,6 +14,7 @@ namespace RappelzSniffer
 	public partial class Form1 : Form
 	{
 		private static Form1 Instance;
+		private static bool IsPaused = false;
 
 		public Form1()
 		{
@@ -50,6 +51,7 @@ namespace RappelzSniffer
 
 		public static void PacketRecv(char src, string name, PacketStream data, string str = "")
 		{
+			if (IsPaused) return;
 			Form1.Instance.Invoke(new MethodInvoker(delegate
 			{
 				int i = Form1.Instance.packets.Rows.Add();
@@ -65,6 +67,7 @@ namespace RappelzSniffer
 
 		public static void PacketSend(char src, string name, PacketStream data, string str = "")
 		{
+			if (IsPaused) return;
 			Form1.Instance.Invoke(new MethodInvoker(delegate
 			{
 				int i = Form1.Instance.packets.Rows.Add();
@@ -88,6 +91,20 @@ namespace RappelzSniffer
 			richTextBox2.Text = "";
 			for (int i = 0; i < d.Length; i++)
 				richTextBox2.AppendText(d[i].ToString("X2") + " ");
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			if (IsPaused)
+			{
+				IsPaused = false;
+				button2.Text = "Pause";
+			}
+			else
+			{
+				IsPaused = true;
+				button2.Text = "Resume";
+			}
 		}
 	}
 }
