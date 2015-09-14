@@ -16,22 +16,27 @@
 0x001B = QuitGame
 0x0033 = ClientVersion
 0x0037 = 37
+0x0064 = PCAttack
+0x0065 = Attack
 0x00C8 = Equip
 0x00C9 = Unequip
 0x00CA = CharView
 0x00CF = InventoryList
 0x00D8 = BeltSlotInfo
+0x011A = ItemDrop
 0x011F = WearChange
-0x0194 = 194
+0x0190 = UseSkill
+0x0191 = Unamed
 0x0192 = LearnSkill
 0x0193 = SkillList
+0x0194 = 194
 0x019A = JobLevelUp
 0x01F7 = 1F7
 0x01F4 = EntityState
 0x01FB = Property
 0x01FC = SetProperty
 0x01FD = MaxHPMPUpdate
-0x01FF = 01FF
+0x01FF = Target
 0x0204 = UpdateHPMP
 0x0258 = QuestList
 0x0259 = QuestUpdate
@@ -58,3 +63,6 @@
 0x2328 = OpenPopup
 0x2329 = UrlList
 0x270F = 270F
+
+0x012F = EquipSummon
+0x044C = Req GameTime

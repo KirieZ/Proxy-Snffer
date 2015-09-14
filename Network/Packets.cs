@@ -67,6 +67,9 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x0033, new Packet() { func = GamePackets.parse_ClientVersion });
 			packets_db.Add(0x0037, new Packet() { func = GamePackets.send_37 });
 
+			packets_db.Add(0x0064, new Packet() { func = GamePackets.parse_PCAttack });
+			packets_db.Add(0x0065, new Packet() { func = GamePackets.send_Attack });
+
 			packets_db.Add(0x00C8, new Packet() { func = GamePackets.parse_Equip });
 			packets_db.Add(0x00C9, new Packet() { func = GamePackets.parse_Unequip });
 			packets_db.Add(0x00CA, new Packet() { func = GamePackets.send_CharView });
@@ -74,14 +77,17 @@ namespace RappelzSniffer.Network
 
 			packets_db.Add(0x00D8, new Packet() { func = GamePackets.send_BeltSlotInfo });
 
+			packets_db.Add(0x011A, new Packet() { func = GamePackets.send_ItemDrop });
 			packets_db.Add(0x011F, new Packet() { func = GamePackets.parse_WearChange });
 
 			//packets_db.Add(0x012F, new Packet() { func = GamePackets.send_12F });
-			packets_db.Add(0x0194, new Packet() { func = GamePackets.send_194 });
-
+			
+			packets_db.Add(0x0190, new Packet() { func = GamePackets.parse_UseSkill });
+			packets_db.Add(0x0191, new Packet() { func = GamePackets.send_Unamed191 });
 			packets_db.Add(0x0192, new Packet() { func = GamePackets.parse_LearnSkill });
 			packets_db.Add(0x0193, new Packet() { func = GamePackets.send_SkillList });
-			
+			packets_db.Add(0x0194, new Packet() { func = GamePackets.send_194 });
+
 			packets_db.Add(0x019A, new Packet() { func = GamePackets.parse_JobLevelUp });
 
 			packets_db.Add(0x01F7, new Packet() { func = GamePackets.parse_1F7 });
@@ -90,7 +96,7 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x01FB, new Packet() { func = GamePackets.send_Property });
 			packets_db.Add(0x01FC, new Packet() { func = GamePackets.parse_SetProperty });
 			packets_db.Add(0x01FD, new Packet() { func = GamePackets.send_MaxHPMPUpdate });
-			packets_db.Add(0x01FF, new Packet() { func = GamePackets.parse_01FF });
+			packets_db.Add(0x01FF, new Packet() { func = GamePackets.parse_Target });
 			packets_db.Add(0x0204, new Packet() { func = GamePackets.send_UpdateHPMP });
 
 			packets_db.Add(0x0258, new Packet() { func = GamePackets.send_QuestList });
