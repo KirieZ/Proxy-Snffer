@@ -155,17 +155,19 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_ClientCmd(ref PacketStream stream)
+		internal static void parse_Chat(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(22) extra = " + stream.ReadString(0, 22));
-			short size = stream.ReadInt16();
-			str.AppendLine("	2B size = " + size);
-			str.AppendLine("	String(size) Command = " + stream.ReadString(0, size));
+			str.AppendLine("	String(21) target = " + stream.ReadString(0, 21));
+			str.AppendLine("	byte request_id = " + stream.ReadByte());
+			byte size = stream.ReadByte();
+			str.AppendLine("	byte len = " + size);
+			str.AppendLine("	byte type = " + stream.ReadByte());
+			str.AppendLine("	String(len) Command = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
@@ -1501,6 +1503,22 @@ namespace RappelzSniffer.Network
 
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
+
+		internal static void send_Chat(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	uint src_handle = " + stream.ReadUInt32());
+			short size = stream.ReadInt16();
+			str.AppendLine("	short size = " + size);
+			str.AppendLine("	String(size) message = " + stream.ReadString(0, size));
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+		}
 	}
 
 	/// <summary>
@@ -1555,6 +1573,75 @@ namespace RappelzSniffer.Network
 			short LowWord = (short)(ll + (2 * (lh + hh)));
 
 			return LowWord;
+		}
+	}
+
+	public class ScrambleMap
+	{
+		public ScrambleMap()
+		{
+			int v3;
+			int i;
+			byte v5;
+
+			for (i = 0; i < 32; ++i)
+			{
+				map[i] = (byte)i;
+			}
+
+			v3 = 3;
+			for (i = 0; i < 32; ++i)
+			{
+				v5 = map[i];
+				if (v3 >= 32)
+					v3 += -32 * (v3 >> 5);
+				map[i] = map[v3];
+				map[v3] = v5;
+				v3 += i + 3;
+			}
+			for (i = 0; i < 32; ++i)
+			{
+				dmap[map[i]] = (byte)i;
+			}
+		}
+
+		private byte[] map = new byte[32];
+		private byte[] dmap = new byte[32];
+
+		private static ScrambleMap scram_map = new ScrambleMap();
+
+		public static int bits_scramble(int c)
+		{
+			int result;
+			uint v2;
+
+			result = 0;
+			v2 = 0;
+			do
+			{
+				if ((((uint)1 << (int)v2) & c) != 0)
+					result |= 1 << scram_map.map[v2];
+				++v2;
+			}
+			while (v2 < 32);
+			return result;
+		}
+
+		public static int bits_descramble(int c)
+		{
+			int result;
+			uint v2;
+
+			result = 0;
+			v2 = 0;
+			do
+			{
+				if ((((uint)1 << (int)v2) & c) != 0)
+					result |= 1 << scram_map.dmap[v2];
+				++v2;
+			}
+			while (v2 < 32);
+			return result;
 		}
 	}
 }

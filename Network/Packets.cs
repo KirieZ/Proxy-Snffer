@@ -57,7 +57,8 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x0008, new Packet() { func = GamePackets.send_PCMove });
 			packets_db.Add(0x000A, new Packet() { func = GamePackets.send_A });
 			packets_db.Add(0x000B, new Packet() { func = GamePackets.send_RegionAck });
-			packets_db.Add(0x0014, new Packet() { func = GamePackets.parse_ClientCmd });
+			packets_db.Add(0x0014, new Packet() { func = GamePackets.parse_Chat });
+			packets_db.Add(0x0015, new Packet() { func = GamePackets.send_Chat });
 			packets_db.Add(0x0016, new Packet() { func = GamePackets.parse_Scripts });
 			packets_db.Add(0x0017, new Packet() { func = GamePackets.parse_LogoutToChar });
 			packets_db.Add(0x0019, new Packet() { func = GamePackets.parse_LogoutToCharCheck });
