@@ -311,5 +311,15 @@ namespace RappelzSniffer.Network
 			
 			inner.Seek(pos, SeekOrigin.Begin);
 		}
+
+		internal void RewriteUInt16(int p1, ushort p2)
+		{
+			long pos = inner.Position;
+
+			inner.Seek(Config.HeaderLength + p1, SeekOrigin.Begin);
+			inner.Write(BitConverter.GetBytes(p2), 0, 2);
+
+			inner.Seek(pos, SeekOrigin.Begin);
+		}
 	}
 }

@@ -13,7 +13,7 @@ namespace RappelzSniffer.Network
 {
 	class Redirector
 	{
-		public static ManualResetEvent allDone = new ManualResetEvent(false);
+		public ManualResetEvent allDone = new ManualResetEvent(false);
 
 		private string ServerIp;
 		private int ServerPort;

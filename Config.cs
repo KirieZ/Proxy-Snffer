@@ -17,11 +17,11 @@ namespace RappelzSniffer
 		public static string Game_ServerIp = "127.0.0.1";
 		public static string Game_ClientIp = "127.0.0.1";
 
-		public static short Auth_ServerPort = 8840;
-		public static short Auth_ClientPort = 8841;
+		public static ushort Auth_ServerPort = 8842;
+		public static ushort Auth_ClientPort = 8841;
 
-		public static short Game_ServerPort = 4504;
-		public static short Game_ClientPort = 4505;
+		public static ushort Game_ServerPort = 6900;
+		public static ushort Game_ClientPort = 4505;
 
 		public static string RC4Key = "}h79q~B%al;k'y $E";
 	}

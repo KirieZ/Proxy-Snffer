@@ -123,7 +123,7 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			data.RewriteInt16(300, Config.Game_ClientPort);
+			data.RewriteUInt16(300, Config.Game_ClientPort);
 
 			Form1.PacketRecv('A', GetPacketName(data.GetId()), data, str.ToString());
 		}
