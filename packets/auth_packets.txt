@@ -1,11 +1,12 @@
-// ======= Auth
+// ======= (Old)Auth
 // Client - Send
-0x270F = TODO
-0x2711 = Version
-0x271A = Login
-0x2725 = Server List Request
-0x2727 = Join Game Server
+0x270F = Ignored
+0x2711 = TS_CA_VERSION
+0x271A = TS_CA_ACCOUNT
+0x271C = TS_CA_IMBC_ACCOUNT
+0x2725 = TS_CA_SERVER_LIST
+0x2727 = TS_CA_SELECT_SERVER
 // Client - Recv
-0x2710 = Login Result
-0x2726 = Server List
-0x2728 = Login Token
+0x2710 = TS_AC_RESULT
+0x2726 = TS_AC_SERVER_LIST
+0x2728 = TS_AC_SELECT_SERVER
