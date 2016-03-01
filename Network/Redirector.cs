@@ -101,81 +101,81 @@ namespace RappelzSniffer.Network
 		// Client ---> Redirector
 		private void ReadCallback(IAsyncResult ar)
 		{
-			//try
-			//{
-			// Read data from the client socket. 
-			int bytesRead = Client.ClSocket.EndReceive(ar);
-			if (bytesRead > 0)
-			{
-				byte[] decode = Client.Decoder.DoCipher(ref Client.Buffer, bytesRead);
-				int curOffset = 0;
-				int bytesToRead = 0;
+            try
+            {
+                // Read data from the client socket. 
+                int bytesRead = Client.ClSocket.EndReceive(ar);
+                if (bytesRead > 0)
+                {
+                    byte[] decode = Client.Decoder.DoCipher(ref Client.Buffer, bytesRead);
+                    int curOffset = 0;
+                    int bytesToRead = 0;
 
-				do
-				{
-					if (Client.PacketSize == 0)
-					{
-						if (Client.Offset + bytesRead > 3)
-						{
-							bytesToRead = (4 - Client.Offset);
-							Client.Data.Write(decode, curOffset, bytesToRead);
-							curOffset += bytesToRead;
-							Client.Offset = bytesToRead;
-							Client.PacketSize = BitConverter.ToInt32(Client.Data.ReadBytes(0, 4, true), 0);
-						}
-						else
-						{
-							Client.Data.Write(decode, 0, bytesRead);
-							Client.Offset += bytesRead;
-							curOffset += bytesRead;
-						}
-					}
-					else
-					{
-						int needBytes = Client.PacketSize - Client.Offset;
+                    do
+                    {
+                        if (Client.PacketSize == 0)
+                        {
+                            if (Client.Offset + bytesRead > 3)
+                            {
+                                bytesToRead = (4 - Client.Offset);
+                                Client.Data.Write(decode, curOffset, bytesToRead);
+                                curOffset += bytesToRead;
+                                Client.Offset = bytesToRead;
+                                Client.PacketSize = BitConverter.ToInt32(Client.Data.ReadBytes(0, 4, true), 0);
+                            }
+                            else
+                            {
+                                Client.Data.Write(decode, 0, bytesRead);
+                                Client.Offset += bytesRead;
+                                curOffset += bytesRead;
+                            }
+                        }
+                        else
+                        {
+                            int needBytes = Client.PacketSize - Client.Offset;
 
-						// If there's enough bytes to complete this packet
-						if (needBytes <= (bytesRead - curOffset))
-						{
-							Client.Data.Write(decode, curOffset, needBytes);
-							curOffset += needBytes;
-							// Packet is done, send to server to be parsed
-							// and continue.
-							PacketReceived(Client.Data);
-							// Do needed clean up to start a new packet
-							Client.Data = new PacketStream();
-							Client.PacketSize = 0;
-							Client.Offset = 0;
-						}
-						else
-						{
-							bytesToRead = (bytesRead - curOffset);
-							Client.Data.Write(decode, curOffset, bytesToRead);
-							Client.Offset += bytesToRead;
-							curOffset += bytesToRead;
-						}
-					}
-				} while (bytesRead - 1 > curOffset);
+                            // If there's enough bytes to complete this packet
+                            if (needBytes <= (bytesRead - curOffset))
+                            {
+                                Client.Data.Write(decode, curOffset, needBytes);
+                                curOffset += needBytes;
+                                // Packet is done, send to server to be parsed
+                                // and continue.
+                                PacketReceived(Client.Data);
+                                // Do needed clean up to start a new packet
+                                Client.Data = new PacketStream();
+                                Client.PacketSize = 0;
+                                Client.Offset = 0;
+                            }
+                            else
+                            {
+                                bytesToRead = (bytesRead - curOffset);
+                                Client.Data.Write(decode, curOffset, bytesToRead);
+                                Client.Offset += bytesToRead;
+                                curOffset += bytesToRead;
+                            }
+                        }
+                    } while (bytesRead - 1 > curOffset);
 
-			}
-			else
-			{
-				//ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
-				return;
-			}
-			/*}
-			catch (Exception e)
-			{
-				ConsoleUtils.Write(MSG_TYPE.Info, "User disconected. " + e.Message);
-			}*/
-			Client.ClSocket.BeginReceive(
-				Client.Buffer,
-				0,
-				Config.MaxBuffer,
-				0,
-				new AsyncCallback(ReadCallback),
-				Client
-			);
+                }
+                else
+                {
+                    //ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
+                    return;
+                }
+                Client.ClSocket.BeginReceive(
+                Client.Buffer,
+                0,
+                Config.MaxBuffer,
+                0,
+                new AsyncCallback(ReadCallback),
+                Client
+            );
+            }
+            catch (Exception e)
+            {
+                //ConsoleUtils.Write(MSG_TYPE.Info, "User disconected. " + e.Message);
+            }
 		}
 
 		// Client --> Redirector
@@ -224,84 +224,85 @@ namespace RappelzSniffer.Network
 		// Server --> Redirector
 		private void ServerReadCallback(IAsyncResult ar)
 		{
-			try
-			{
-				// Read data from the client socket. 
-				int bytesRead = Server.ClSocket.EndReceive(ar);
-				if (bytesRead > 0)
-				{
-					byte[] decode = Server.Decoder.DoCipher(ref Server.Buffer, bytesRead);
-					int curOffset = 0;
-					int bytesToRead = 0;
+            try
+            {
+                // Read data from the client socket. 
+                int bytesRead = Server.ClSocket.EndReceive(ar);
+                if (bytesRead > 0)
+                {
+                    byte[] decode = Server.Decoder.DoCipher(ref Server.Buffer, bytesRead);
+                    int curOffset = 0;
+                    int bytesToRead = 0;
 
-					do
-					{
-						if (Server.PacketSize == 0)
-						{
-							if (Server.Offset + bytesRead > 3)
-							{
-								bytesToRead = (4 - Server.Offset);
-								Server.Data.Write(decode, curOffset, bytesToRead);
-								curOffset += bytesToRead;
-								Server.Offset = bytesToRead;
-								Server.PacketSize = BitConverter.ToInt32(Server.Data.ReadBytes(0, 4, true), 0);
-							}
-							else
-							{
-								Server.Data.Write(decode, 0, bytesRead);
-								Server.Offset += bytesRead;
-								curOffset += bytesRead;
-							}
-						}
-						else
-						{
-							int needBytes = Server.PacketSize - Server.Offset;
+                    do
+                    {
+                        if (Server.PacketSize == 0)
+                        {
+                            if (Server.Offset + bytesRead > 3)
+                            {
+                                bytesToRead = (4 - Server.Offset);
+                                Server.Data.Write(decode, curOffset, bytesToRead);
+                                curOffset += bytesToRead;
+                                Server.Offset = bytesToRead;
+                                Server.PacketSize = BitConverter.ToInt32(Server.Data.ReadBytes(0, 4, true), 0);
+                            }
+                            else
+                            {
+                                Server.Data.Write(decode, 0, bytesRead);
+                                Server.Offset += bytesRead;
+                                curOffset += bytesRead;
+                            }
+                        }
+                        else
+                        {
+                            int needBytes = Server.PacketSize - Server.Offset;
 
-							// If there's enough bytes to complete this packet
-							if (needBytes <= (bytesRead - curOffset))
-							{
-								Server.Data.Write(decode, curOffset, needBytes);
-								curOffset += needBytes;
-								// Packet is done, send to server to be parsed
-								// and continue.
-								ServerPacketReceived(Server.Data);
-								// Do needed clean up to start a new packet
-								Server.Data = new PacketStream();
-								Server.PacketSize = 0;
-								Server.Offset = 0;
-							}
-							else
-							{
-								bytesToRead = (bytesRead - curOffset);
-								Server.Data.Write(decode, curOffset, bytesToRead);
-								Server.Offset += bytesToRead;
-								curOffset += bytesToRead;
-							}
-						}
-					} while (bytesRead - 1 > curOffset);
+                            // If there's enough bytes to complete this packet
+                            if (needBytes <= (bytesRead - curOffset))
+                            {
+                                Server.Data.Write(decode, curOffset, needBytes);
+                                curOffset += needBytes;
+                                // Packet is done, send to server to be parsed
+                                // and continue.
+                                ServerPacketReceived(Server.Data);
+                                // Do needed clean up to start a new packet
+                                Server.Data = new PacketStream();
+                                Server.PacketSize = 0;
+                                Server.Offset = 0;
+                            }
+                            else
+                            {
+                                bytesToRead = (bytesRead - curOffset);
+                                Server.Data.Write(decode, curOffset, bytesToRead);
+                                Server.Offset += bytesToRead;
+                                curOffset += bytesToRead;
+                            }
+                        }
+                    } while (bytesRead - 1 > curOffset);
 
-				}
-				else
-				{
-					//ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
-					return;
-				}
-			}
-			catch (SocketException e)
-			{
-				Form1.Log("Connection lost.");
-				Form1.Log(e.Message);
-				allDone.Set();
-				return;
-			}
-			Server.ClSocket.BeginReceive(
-				Server.Buffer,
-				0,
-				Config.MaxBuffer,
-				0,
-				new AsyncCallback(ServerReadCallback),
-				Server
-			);
+                }
+                else
+                {
+                    //ConsoleUtils.Write(ConsoleMsgType.Info, "User disconected\r\n");
+                    return;
+                }
+
+                Server.ClSocket.BeginReceive(
+                Server.Buffer,
+                0,
+                Config.MaxBuffer,
+                0,
+                new AsyncCallback(ServerReadCallback),
+                Server
+            );
+            }
+            catch (SocketException e)
+            {
+                Form1.Log("Connection lost.");
+                Form1.Log(e.Message);
+                allDone.Set();
+                return;
+            }
 		}
 
 		// Server --> Redirector

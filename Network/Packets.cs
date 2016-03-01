@@ -79,7 +79,7 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x00D8, new Packet() { func = GamePackets.send_BeltSlotInfo });
 
 			packets_db.Add(0x011A, new Packet() { func = GamePackets.send_ItemDrop });
-			packets_db.Add(0x011F, new Packet() { func = GamePackets.parse_WearChange });
+			//packets_db.Add(0x011F, new Packet() { func = GamePackets.parse_WearChange });
 
 			//packets_db.Add(0x012F, new Packet() { func = GamePackets.send_12F });
 			
