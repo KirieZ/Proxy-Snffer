@@ -124,6 +124,7 @@ namespace RappelzSniffer.Network
 			str.AppendLine("}");
 
 			data.RewriteUInt16(300, Config.Game_ClientPort);
+            data.RewriteString(284, Config.Game_ClientIp, 16);
 
 			Form1.PacketRecv('A', GetPacketName(data.GetId()), data, str.ToString());
 		}
