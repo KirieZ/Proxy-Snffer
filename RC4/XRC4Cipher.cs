@@ -1,6 +1,4 @@
-﻿// Copyright (c) Tartarus Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +8,8 @@ namespace RappelzSniffer.RC4
 {
 	public class XRC4Cipher
 	{
-		class TImpl : RC4Cipher { }
+        #region Cipher
+        class TImpl : RC4Cipher { }
 
 		TImpl m_pImpl;
 
@@ -40,8 +39,10 @@ namespace RappelzSniffer.RC4
 
             return pDst;
 		}
+        #endregion
 
-		public byte[] Encode(ref byte[] pSrc, int len, bool bIsPeek = false)
+        #region Encode/Decode/Cleanup
+        public byte[] Encode(ref byte[] pSrc, int len, bool bIsPeek = false)
 		{
 			if (bIsPeek)
 				return Peek(ref pSrc, len);
@@ -61,5 +62,6 @@ namespace RappelzSniffer.RC4
 		{
 			m_pImpl.Init("Neat & Simple");
 		}
-	}
+        #endregion
+    }
 }

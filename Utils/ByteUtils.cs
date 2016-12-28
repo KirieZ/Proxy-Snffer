@@ -1,5 +1,3 @@
-// Copyright (c) Tartarus Dev Team, licensed under GNU GPL.
-// See the LICENSE file
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +6,12 @@ using System.Threading.Tasks;
 
 namespace Utils
 {
-	/// <summary>
-	/// Swap values between big endian and small endian
-	/// and other byte manipulations
-	/// </summary>
 	public static class ByteUtils
 	{
-		// Code base on https://jamesmccaffrey.wordpress.com/2013/12/29/converting-a-big-endian-integer-to-low-endian-using-c/
+        // Code base on https://jamesmccaffrey.wordpress.com/2013/12/29/converting-a-big-endian-integer-to-low-endian-using-c/
 
-		//
-		public static string toString(byte[] buffer)
+        #region Bytes To String
+        public static string toString(byte[] buffer)
 		{
 			int num = 0;
 
@@ -36,37 +30,42 @@ namespace Utils
 
 			return Encoding.ASCII.GetString(str);
 		}
+        #endregion
 
-		/// <summary>
-		/// Swaps a Int16 (2 byte) byte array from Big Endian
-		/// to Small Endian or vice-versa.
-		/// </summary>
-		/// <param name="value">The array to be converted</param>
-		/// <returns>Int16 value swapped</returns>
-		public static Int16 toInt16(byte[] value)
+        #region Bytes to Int16
+        /// <summary>
+        /// Swaps a Int16 (2 byte) byte array from Big Endian
+        /// to Small Endian or vice-versa.
+        /// </summary>
+        /// <param name="value">The array to be converted</param>
+        /// <returns>Int16 value swapped</returns>
+        public static Int16 toInt16(byte[] value)
 		{
 			Array.Reverse(value);
 			return BitConverter.ToInt16(value, 0);
 		}
+        
 
-		/// <summary>
-		/// Swaps a Int16 from Big Endian to Small
-		/// Endian and vice-versa
-		/// </summary>
-		/// <param name="value">The value to be swapped</param>
-		/// <returns>Int16 value swapped</returns>
-		public static Int16 toInt16(Int16 value)
+        /// <summary>
+        /// Swaps a Int16 from Big Endian to Small
+        /// Endian and vice-versa
+        /// </summary>
+        /// <param name="value">The value to be swapped</param>
+        /// <returns>Int16 value swapped</returns>
+        public static Int16 toInt16(Int16 value)
 		{
 			return toInt16(BitConverter.GetBytes(value));
 		}
+        #endregion
 
-		/// <summary>
-		/// Swaps a Int32 (4 byte) byte array from Big Endian
-		/// to Small Endian or vice-versa.
-		/// </summary>
-		/// <param name="value">The array to be converted</param>
-		/// <returns>Int32 value swapped</returns>
-		public static Int32 toInt32(byte[] value)
+        #region Bytes to Int32
+        /// <summary>
+        /// Swaps a Int32 (4 byte) byte array from Big Endian
+        /// to Small Endian or vice-versa.
+        /// </summary>
+        /// <param name="value">The array to be converted</param>
+        /// <returns>Int32 value swapped</returns>
+        public static Int32 toInt32(byte[] value)
 		{
 			Array.Reverse(value);
 			return BitConverter.ToInt32(value, 0);
@@ -82,14 +81,16 @@ namespace Utils
 		{
 			return toInt32(BitConverter.GetBytes(value));
 		}
+        #endregion
 
-		/// <summary>
-		/// Swaps a Int64 (8 byte) byte array from Big Endian
-		/// to Small Endian or vice-versa.
-		/// </summary>
-		/// <param name="value">The array to be converted</param>
-		/// <returns>Int64 value swapped</returns>
-		public static Int64 toInt64(byte[] value)
+        #region Bytes to Int64
+        /// <summary>
+        /// Swaps a Int64 (8 byte) byte array from Big Endian
+        /// to Small Endian or vice-versa.
+        /// </summary>
+        /// <param name="value">The array to be converted</param>
+        /// <returns>Int64 value swapped</returns>
+        public static Int64 toInt64(byte[] value)
 		{
 			Array.Reverse(value);
 			return BitConverter.ToInt64(value, 0);
@@ -105,16 +106,15 @@ namespace Utils
 		{
 			return toInt64(BitConverter.GetBytes(value));
 		}
+        #endregion
 
-
-		// [Pyrok]
-
-		/// <summary>
-		/// The return value is the high-order word of the specified value.
-		/// </summary>
-		/// <param name="pDWord"></param>
-		/// <returns></returns>
-		public static short HiWord(int pDWord)
+        #region Byte to High/Low order
+        /// <summary>
+        /// The return value is the high-order word of the specified value.
+        /// </summary>
+        /// <param name="pDWord"></param>
+        /// <returns></returns>
+        public static short HiWord(int pDWord)
 		{
 			return ((short)(((pDWord) >> 16) & 0xFFFF));
 		}
@@ -129,5 +129,6 @@ namespace Utils
 		{
 			return ((short)(pDWord & 0xffff));
 		}
-	}
+        #endregion
+    }
 }

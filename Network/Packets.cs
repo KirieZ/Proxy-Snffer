@@ -16,29 +16,24 @@ namespace RappelzSniffer.Network
 		{
 			public PacketAction func;
 		}
-
-		public static Dictionary<short, Packet> LoadAuthPackets()
+        public static Dictionary<short, Packet> LoadAuthPackets()
 		{
-			Dictionary<short, Packet> packets_db = new Dictionary<short, Packet>();
+            Dictionary<short, Packet> packets_db = new Dictionary<short, Packet>();
 
-			// [0x270F] 9999 -> Unknown1 (Client)
-			packets_db.Add(0x270F, new Packet() { func = AuthPackets.parse_Unknown1 });
-			// [0x2710] 10000 -> Login Result (Server)
-			packets_db.Add(0x2710, new Packet() { func = AuthPackets.send_LoginResult });
-			// [0x2711] 10001 -> Client Version (?) (Client)
-			packets_db.Add(0x2711, new Packet() { func = AuthPackets.parse_ClientVersion });
-
-			// [0x271A] 10010 -> Login Try (Client)
-			packets_db.Add(0x271A, new Packet() { func = AuthPackets.parse_LoginTry });
-
-			// [0x2725] 10021 -> Request Server List (Client)
-			packets_db.Add(0x2725, new Packet() { func = AuthPackets.parse_RequestServerList });
-			// [0x2726] 10022 -> Server List (Server)
-			packets_db.Add(0x2726, new Packet() {  func = AuthPackets.send_ServerList });
-			// [0x2727] 10023 -> Join Game Server (Client)
-			packets_db.Add(0x2727, new Packet() { func = AuthPackets.parse_JoinGameServer });
-			// [0x2728] 10024 -> Allow Join (?) (Server)
-			packets_db.Add(0x2728, new Packet() { func = AuthPackets.send_JoinGame });
+            packets_db.Add(0x0, new Packet()    { func = AuthPackets.TS_SC_RESULT });
+            packets_db.Add(0x47, new Packet()   { func = AuthPackets.TS_CA_RSA_PUBLIC_KEY });
+            packets_db.Add(0x48, new Packet()   { func = AuthPackets.TS_AC_AES_KEY_IV });
+            packets_db.Add(0x270F, new Packet() { func = AuthPackets.TS_DUMMY });
+            packets_db.Add(0x2710, new Packet() { func = AuthPackets.TS_AC_RESULT });
+            packets_db.Add(0x2711, new Packet() { func = AuthPackets.TS_CA_VERSION });
+            packets_db.Add(0x2712, new Packet() { func = AuthPackets.TS_AC_RESULT_WITH_STRING });
+            packets_db.Add(0x271A, new Packet() { func = AuthPackets.TS_CA_OTP_ACCOUNT });
+            packets_db.Add(0x271C, new Packet() { func = AuthPackets.TS_CA_IMBC_ACCOUNT });
+            packets_db.Add(0x2725, new Packet() { func = AuthPackets.TS_CA_SERVER_LIST });
+            packets_db.Add(0x2726, new Packet() { func = AuthPackets.TS_AC_SERVER_LIST });
+            packets_db.Add(0x2727, new Packet() { func = AuthPackets.TS_CA_SELECT_SERVER });
+            packets_db.Add(0x2728, new Packet() { func = AuthPackets.TS_AC_SELECT_SERVER });
+            packets_db.Add(0x272A, new Packet() { func = AuthPackets.TS_CA_DISTRIBUTION_INFO });
 			
 			return packets_db;
 		}
