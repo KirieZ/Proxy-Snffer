@@ -1,6 +1,4 @@
-﻿// Copyright (c) Tartarus Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,16 +17,18 @@ namespace RappelzSniffer.RC4
 			public byte[] s;
 		}
 
-		#endregion
+        #endregion
 
-		public bool Init(string pKey)
+        #region PrepareState
+        public bool Init(string pKey)
 		{
 			return PrepareKey(pKey);
 		}
+        #endregion
 
-		#region Encrypt and Decrypt Publics
+        #region Encrypt and Decrypt Publics
 
-		public byte[] Code(ref byte[] pSrc, int len)
+        public byte[] Code(ref byte[] pSrc, int len)
 		{
 			return CodeBlock(ref pSrc, len);
 		}
@@ -50,12 +50,14 @@ namespace RappelzSniffer.RC4
 		public void SaveStateTo(out State outState) { outState = m_state; }
 		public void LoadStateFrom(ref State aState) { m_state = aState; }
 
-		#endregion
+        #endregion
 
-		// Privates
-		private State m_state;
+        #region Private entry's
+        private State m_state;
+        #endregion
 
-		private bool PrepareKey(string pKey)
+        #region PrepareKey
+        private bool PrepareKey(string pKey)
 		{
 			if (String.IsNullOrEmpty(pKey))
 				return false;
@@ -91,8 +93,10 @@ namespace RappelzSniffer.RC4
 
 			return true;
 		}
+        #endregion
 
-		private byte[] CodeBlock(ref byte[] pSrc, int len)
+        #region CodeBlock
+        private byte[] CodeBlock(ref byte[] pSrc, int len)
 		{
             byte[] pDst = new byte[len];
 			int x = m_state.x, y = m_state.y;
@@ -112,8 +116,10 @@ namespace RappelzSniffer.RC4
             
             return pDst;
 		}
+        #endregion
 
-		private IEnumerable<byte> EncryptOutput(IEnumerable<byte> data)
+        #region Enumrate
+        private IEnumerable<byte> EncryptOutput(IEnumerable<byte> data)
 		{
 			int i = 0;
 			int j = 0;
@@ -128,16 +134,20 @@ namespace RappelzSniffer.RC4
 				return (byte)(b ^ m_state.s[(m_state.s[i] + m_state.s[j]) & 0xFF]);
 			});
 		}
+        #endregion
 
-		private void Swap(byte[] s, int i, int j)
+        #region Swap Bytes
+        private void Swap(byte[] s, int i, int j)
 		{
 			byte c = s[i];
 
 			s[i] = s[j];
 			s[j] = c;
 		}
+        #endregion
 
-		private void SkipFor(int len)
+        #region Skip Bytes
+        private void SkipFor(int len)
 		{
 			int x = 0; int y = 0;
 			while (len-- > 0)
@@ -150,5 +160,6 @@ namespace RappelzSniffer.RC4
 
 			m_state.x = x; m_state.y = y;
 		}
-	}
+        #endregion
+    }
 }

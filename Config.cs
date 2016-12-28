@@ -8,13 +8,16 @@ namespace RappelzSniffer
 {
 	public static class Config
 	{
-		public const int MaxBuffer = 2048;
+        #region Packet Configuration
+        public const int MaxBuffer = 4096;
 		public const int HeaderLength = 7;
+        #endregion
 
-		public static string Auth_ServerIp = "127.0.0.1";
+        #region Server Configuration
+        public static string Auth_ServerIp = "77.161.174.249";
 		public static string Auth_ClientIp = "127.0.0.1";
 
-		public static string Game_ServerIp = "127.0.0.1";
+		public static string Game_ServerIp = "77.161.174.249";
 		public static string Game_ClientIp = "127.0.0.1";
 
 		public static ushort Auth_ServerPort = 8841;
@@ -22,7 +25,10 @@ namespace RappelzSniffer
 
 		public static ushort Game_ServerPort = 6900;
 		public static ushort Game_ClientPort = 4505;
+        #endregion
 
-		public static string RC4Key = "}h79q~B%al;k'y $E";
-	}
+        #region PrivateKey Configuration
+        public static string RC4Key = "}h79q~B%al;k'y $E";
+        #endregion
+    }
 }
