@@ -79,7 +79,8 @@ namespace RappelzSniffer
 				Form1.Instance.packets.Rows[i].Cells[3].Value = data.ToArray().Length;
 				Form1.Instance.packets.Rows[i].Cells[4].Value = data;
 				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
-			}));
+                Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
+            }));
 		}
 
 		public static void PacketSend(char src, string name, PacketStream data, string str = "")
@@ -95,7 +96,8 @@ namespace RappelzSniffer
 				Form1.Instance.packets.Rows[i].Cells[3].Value = data.ToArray().Length;
 				Form1.Instance.packets.Rows[i].Cells[4].Value = data;
 				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
-			}));
+                Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
+            }));
 		}
 
         private void packets_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -126,6 +128,7 @@ namespace RappelzSniffer
 
         private void packets_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
+            if (e.RowIndex < 0) return;
             packets.CurrentCell = packets.Rows[e.RowIndex].Cells[0];
         }
     }
