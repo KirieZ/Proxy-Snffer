@@ -60,6 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="HexEdit.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Network\AuthPackets.cs" />
     <Compile Include="Network\GamePackets.cs" />
     <Compile Include="Network\Objects.cs" />
@@ -77,6 +80,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ByteUtils.cs" />
+    <Compile Include="Win32API.cs" />
+    <EmbeddedResource Include="HexEdit.resx" />
     <EmbeddedResource Include="UI\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

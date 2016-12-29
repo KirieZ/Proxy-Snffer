@@ -42,12 +42,14 @@ namespace RappelzSniffer.Network
 
 			IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(this.ClientIp), this.ClientPort);
 
+            Form1.Log("Starting Inspection");
 			Socket listener = new Socket(SocketType.Stream, ProtocolType.Tcp);
 			try
 			{
 				Server = new NetContainer();
 				Server.ClSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-				Server.ClSocket.Connect(this.ServerIp, this.ServerPort);
+                Form1.Log("Attempting to connect sockets \r\n please wait till further notice");
+                Server.ClSocket.Connect(this.ServerIp, this.ServerPort);
 				Server.Encoder = new XRC4Cipher(Config.RC4Key);
 				Server.Decoder = new XRC4Cipher(Config.RC4Key);
 				Server.Buffer = new byte[Config.MaxBuffer];
@@ -172,7 +174,7 @@ namespace RappelzSniffer.Network
                 Client
             );
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //ConsoleUtils.Write(MSG_TYPE.Info, "User disconected. " + e.Message);
             }
