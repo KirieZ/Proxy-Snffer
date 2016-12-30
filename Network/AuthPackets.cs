@@ -11,52 +11,10 @@ namespace RappelzSniffer.Network
 	public static class AuthPackets
 	{
 		private static Dictionary<short, Packets.Packet> packet_db;
-		private static Dictionary<short, string> packet_names;
 
 		static AuthPackets()
 		{
 			packet_db = Packets.LoadAuthPackets();
-			LoadPacketNames();
-		}
-
-		static void LoadPacketNames()
-		{
-			packet_names = new Dictionary<short, string>();
-			if (File.Exists("packets/auth_packets.txt"))
-			{
-				string[] lines = File.ReadAllLines("packets/auth_packets.txt");
-
-				for (int i = 0; i < lines.Length; i++)
-				{
-					if (lines[i].StartsWith("//")) continue;
-					else if (!lines[i].Contains('=')) continue;
-
-					string[] val = lines[i].Split('=');
-					short id;
-					if (!short.TryParse(val[0].Trim(' '), out id))
-					{
-						// If can't convert from int, try Hex (0x)
-						try
-						{
-							id = (short)new System.ComponentModel.Int16Converter().ConvertFromString(val[0].Trim(' '));
-						}
-						catch (Exception)
-						{
-							continue;
-						}
-					}
-
-					if (!packet_names.ContainsKey(id))
-					{
-						packet_names.Add(id, val[1].TrimStart(' '));
-					}
-				}
-			}
-		}
-
-		internal static string GetPacketName(short id)
-		{
-			return (packet_names.ContainsKey(id) ? packet_names[id] : "Unknown");
 		}
 
 		internal static PacketStream PacketReceived(char src, PacketStream stream)
@@ -64,175 +22,180 @@ namespace RappelzSniffer.Network
 			// Header
 			// [Size:4]
 			// [ID:2]
-			// [Checksum(?):1]
+			// [Checksum:1]
 			short PacketId = stream.GetId();
 			stream.ReadByte();
 
-			/*if (!packet_db.ContainsKey(PacketId))
-			{
-				ConsoleUtils.HexDump(stream.ToArray(), "Unknown Packet Received", PacketId, stream.GetSize());
-				return;
-			}
-
-			ConsoleUtils.HexDump(
-				stream.ToArray(),
-				"Packet Received",
-				PacketId,
-				stream.GetSize()
-			);*/
-
-			if (packet_db.ContainsKey(PacketId))
-				packet_db[PacketId].func(ref stream);
-			else
-			{
-				if (src == 'S')
-					Form1.PacketRecv('A', GetPacketName(PacketId), stream);
-				else
-					Form1.PacketSend('A', GetPacketName(PacketId), stream);
-			}
+            if (packet_db.ContainsKey(PacketId))
+            {
+                packet_db[PacketId].func(ref stream);
+            }
+            else
+            {
+                if (src == 'S')
+                    Form1.PacketRecv('A', "Unknown", stream);
+                else
+                    Form1.PacketSend('A', "Unknown", stream);
+            }
 
 			return stream;
 		}
 
-		internal static void TS_AC_SERVER_LIST(ref PacketStream data)
-		{
-			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(data.GetId()) + " [" + data.GetId() + "]");
-			data.ReadByte();
+        internal static void TS_AC_SERVER_LIST(ref PacketStream data)
+        {
+            StringBuilder str = new StringBuilder();
 
-			str.AppendLine("{");
-			str.AppendLine("	Int16 Unknown = " + data.ReadInt16());
-			short svCount = data.ReadInt16();
-			str.AppendLine("	Int16 ServerCount = " + svCount);
-			str.AppendLine("	struct Servers[ServerCount]");
-			str.AppendLine("	{");
-			
-			for (int i = 0; i < svCount; i++)
-			{
-				str.AppendLine("		{");
-				str.AppendLine("			Int16 Index = " + data.ReadInt16());
-				str.AppendLine("			String(22) Name = " + data.ReadString(0, 22));
-				str.AppendLine("			String(256) URL = " + data.ReadString(0, 256));
-				str.AppendLine("			String(16) IP = " + data.ReadString(0, 16));
-				str.AppendLine("			Int16 Port = " + data.ReadInt16());
-				str.AppendLine("			Int16 Unknown = " + data.ReadInt16());
-				str.AppendLine("			Int16 Unknown = " + data.ReadInt16());
-				str.AppendLine("		}");
-			}
+            str.Append("struct TS_AC_SERVER_LIST [").Append(data.GetId()).Append("]\r\n");
+            data.ReadByte();
 
-			str.AppendLine("	}");
-			str.AppendLine("}");
+            str.Append("{\r\n");
+            str.Append("	ushort LastLoginServerId = ").Append(data.ReadUInt16()).Append(";\r\n");
+            ushort svCount = data.ReadUInt16();
+            str.Append("	ushort Count = ").Append(svCount).Append(";\r\n");
+            str.Append("	struct Servers[Count]\r\n");
+            str.Append("    {\r\n");
+            for (int i = 0; i < svCount; i++)
+            {
+                str.Append("		{\r\n");
+                str.Append("			ushort Index = ").Append(data.ReadUInt16()).Append("\r\n");
+                str.Append("			string(22) Name = ").Append(data.ReadString(0, 22)).Append("\r\n");
+                str.Append("			string(256) URL = ").Append(data.ReadString(0, 256)).Append("\r\n");
+                str.Append("			string(16) IP = ").Append(data.ReadString(0, 16)).Append("\r\n");
+                str.Append("			int Port = ").Append(data.ReadInt32()).Append("\r\n");
+                str.Append("			ushort UserRatio = ").Append(data.ReadInt16()).Append("\r\n");
+                str.Append("		}\r\n");
+            }
+            str.Append("    }\r\n");
+            str.Append("}");
 
 			data.RewriteUInt16(300, Config.Game_ClientPort);
             data.RewriteString(284, Config.Game_ClientIp, 16);
 
-			Form1.PacketRecv('A', GetPacketName(data.GetId()), data, str.ToString());
-		}
+			Form1.PacketRecv('A', "TS_AC_SERVER_LIST", data, str.ToString());
+        }
 
         #region Parse Packet
 
         internal static void TS_SC_RESULT(ref PacketStream pStream)
         {
-            //struct TS_AC_RESULT : public TS_MESSAGE
-            //{
-	           // enum LOGIN_SUCCESS_FLAG
+            // enum LOGIN_SUCCESS_FLAG
             //        {
             //            LSF_EULA_ACCEPTED = 0x1,
             //            LSF_ACCOUNT_BLOCK_WARNING = 0x2,
             //            LSF_DISTRIBUTION_CODE_REQUIRED = 0x4
             //        };
+            
+            // Extends: TS_MESSAGE
+            StringBuilder str = new StringBuilder();
+            str.Append("struct TS_AC_RESULT [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-            //        uint16_t request_msg_id;
-            //        uint16_t result;
-            //        int32_t login_flag;
-            //        static const uint16_t packetID = 10000;
-            //    };
-            //}
+            str.Append("{\r\n");
+            str.Append("	ushort request_msg_id; = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            str.Append("	ushort result; = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            str.Append("	int login_flag; = ").Append(pStream.ReadInt32()).Append("\r\n");
+            str.Append("	static const uint16_t packetID = 10000;").Append("\r\n");
+            str.Append("}\r\n");
+            str.Append("}\r\n");
+
+            Form1.PacketRecv('A', "TS_AC_RESULT", pStream, str.ToString());
         }
 
         internal static void TS_CA_RSA_PUBLIC_KEY(ref PacketStream pStream)
         {
-            //struct TS_CA_RSA_PUBLIC_KEY : public TS_MESSAGE_WNA
-            //{
-	           // int key_size;
-            //        unsigned char key[0];
-            //        static const uint16_t packetID = 71;
-            //};
+            // Extends: TS_MESSAGE_WNA
+            StringBuilder str = new StringBuilder();
+            str.Append("struct TS_CA_RSA_PUBLIC_KEY [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
+
+            str.Append("{\r\n");
+            str.Append("	int key_size; = ").Append(pStream.ReadInt32()).Append("\r\n");
+            str.Append("	byte key[0]; = ").Append(pStream.ReadByte()).Append("\r\n");
+            str.Append("	static const uint16_t packetID = 71;").Append("\r\n");
+            str.Append("}\r\n");
+
+            Form1.PacketSend('A', "TS_CA_RSA_PUBLIC_KEY", pStream, str.ToString());
         }
 
         internal static void TS_AC_AES_KEY_IV(ref PacketStream pStream)
         {
-            //struct TS_AC_AES_KEY_IV : public TS_MESSAGE_WNA
-            //{
-	           // int data_size;
-            //        unsigned char rsa_encrypted_data[0];
-            //        static const uint16_t packetID = 72;
-            //};
+            // Extends: TS_MESSAGE_WNA
+            StringBuilder str = new StringBuilder();
+            str.Append("struct TS_AC_AES_KEY_IV [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
+
+            str.Append("{\r\n");
+            str.Append("	int data_size; = ").Append(pStream.ReadInt32()).Append("\r\n");
+            str.Append("	byte rsa_encrypted_data[0]; = ").Append(pStream.ReadByte()).Append("\r\n");
+            str.Append("	static const uint16_t packetID = 72;").Append("\r\n");
+            str.Append("}\r\n");
+
+            Form1.PacketRecv('A', "TS_AC_AES_KEY_IV", pStream, str.ToString());
         }
 
         internal static void TS_DUMMY(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+			str.Append("struct TS_DUMMY [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
+            str.AppendLine("{");
 			str.AppendLine("	????");
 			str.AppendLine("}");
 
-			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', "TS_DUMMY", pStream, str.ToString());
 		}
 
 		internal static void TS_CA_VERSION(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+			str.Append("struct TS_CA_VERSION [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
-			str.AppendLine("	String(20) Version = " + pStream.ReadString(0, 20));
-			str.AppendLine("}");
+			str.Append("{\r\n");
+			str.Append("	String(20) Version = ").Append(pStream.ReadString(0, 20)).Append("\r\n");
+			str.Append("}");
 
-			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', "TS_CA_VERSION", pStream, str.ToString());
 		}
 
 		internal static void TS_CA_OTP_ACCOUNT(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+            str.Append("struct TS_CA_OTP_ACCOUNT [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
-			str.AppendLine("	String UserID = " + pStream.ReadString(0, 60));
-			str.AppendLine("	String UserPass = " + pStream.ReadString(0, 8));
-			str.AppendLine("}");
+            str.Append("{\r\n");
+			str.Append("	String UserID = ").Append(pStream.ReadString(0, 60)).Append("\r\n");
+			str.Append("	String UserPass = ").Append(pStream.ReadString(0, 8)).Append("\r\n");
+			str.Append("}");
 
-			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', "TS_CA_OTP_ACCOUNT", pStream, str.ToString());
 		}
 		
 		internal static void TS_CA_SERVER_LIST(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+			str.Append("struct TS_CA_SERVER_LIST [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
+            str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', "TS_CA_SERVER_LIST", pStream, str.ToString());
 		}
 
 		internal static void TS_CA_SELECT_SERVER(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+			str.AppendLine("struct TS_CA_SELECT_SERVER [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
-			str.AppendLine("	Int16 index = " + pStream.ReadInt16());
-			str.AppendLine("}");
+            str.Append("{\r\n");
+			str.Append("	Int16 index = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("}");
 
-			Form1.PacketSend('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
+			Form1.PacketSend('A', "TS_CA_SELECT_SERVER", pStream, str.ToString());
 		}
 
         internal static void TS_AC_RESULT_WITH_STRING(ref PacketStream pStream)
@@ -298,37 +261,35 @@ namespace RappelzSniffer.Network
         internal static void TS_AC_RESULT(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+			str.Append("struct TS_AC_RESULT [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-			str.AppendLine("{");
-			str.AppendLine("	Int16 PacketId = " + pStream.ReadInt16());
-			str.AppendLine("	Int16 Result = " + pStream.ReadInt16());
-			str.AppendLine("	Int32 Unknown = " + pStream.ReadInt32());
-			str.AppendLine("}");
+            str.Append("{\r\n");
+			str.Append("	Int16 PacketId = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("	Int16 Result = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("	Int32 Unknown = ").Append(pStream.ReadInt32()).Append("\r\n");
+			str.Append("}");
 
-			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
-		}
+			Form1.PacketRecv('A', "TS_AC_RESULT", pStream, str.ToString());
+
+        }
 
 		/// [0x2728] 10024 -> (AC) Join Game (Login Token)
 		/// <unknown>.W <key>.8B <0A 00 00 00>.L
 		internal static void TS_AC_SELECT_SERVER(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(pStream.GetId()) + " [" + pStream.GetId() + "]");
-			pStream.ReadByte();
+            str.Append("struct TS_AC_SELECT_SERVER [").Append(pStream.GetId()).Append("]\r\n");
 
-			str.AppendLine("{");
-			str.AppendLine("	Int16 Unknown = " + pStream.ReadInt16());
-			str.Append	  ("	byte[8] = ");
-			for (int i = 0; i < 8; i++)
-				str.Append(pStream.ReadByte() + " ");
-			str.Append("\r\n");
-			str.AppendLine("	Int32 Unknown = " + pStream.ReadInt32());
-			str.AppendLine("}");
+			str.Append("{\r\n");
+			str.Append("	ushort result = ").Append(pStream.ReadUInt16()).Append("\r\n");
+			str.Append("	ulong one_time_key = ").Append(pStream.ReadInt64()).Append("\r\n");
+			str.Append("	uint pending_time = ").Append(pStream.ReadUInt32()).Append("\r\n");
+			str.Append("}");
 
-			Form1.PacketRecv('A', GetPacketName(pStream.GetId()), pStream, str.ToString());
-		}
+			Form1.PacketRecv('A', "TS_AC_SELECT_SERVER", pStream, str.ToString());
+
+        }
 		
 		#endregion
 	}
