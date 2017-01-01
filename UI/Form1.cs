@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using RappelzSniffer.Network;
 using HexEdit;
+using System.IO;
 
 namespace RappelzSniffer
 {
@@ -17,6 +18,8 @@ namespace RappelzSniffer
 		private static Form1 Instance;
 		private static bool IsPaused = false;
         private static bool hasstarted = false;
+
+        private const string logFile = "packet_dump.log";
 
         public Form1()
 		{
@@ -81,9 +84,10 @@ namespace RappelzSniffer
 				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
                 Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
             }));
+            LogToFile("received from", src, name, data, str);
 		}
 
-		public static void PacketSend(char src, string name, PacketStream data, string str = "")
+        public static void PacketSend(char src, string name, PacketStream data, string str = "")
 		{
 			if (IsPaused) return;
 			Form1.Instance.Invoke(new MethodInvoker(delegate
@@ -98,7 +102,50 @@ namespace RappelzSniffer
 				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
                 Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
             }));
-		}
+            LogToFile("sent to", src, name, data, str);
+        }
+
+        private static void LogToFile(string dir, char src, string name, PacketStream data, string str = "")
+        {
+            int id = data.GetId();
+            byte[] dataArray = data.ToArray();
+
+            StringBuilder hexDump = new StringBuilder();
+            StringBuilder asciiDump = new StringBuilder();
+            for (int i = 0; i < dataArray.Length; i++)
+            {
+                if (i % 16 == 0 && i > 0)
+                {
+                    byte b = dataArray[i];
+                    hexDump.AppendFormat(Environment.NewLine + "{0:x2} ", b);
+                    asciiDump.Append(Environment.NewLine + (b < 32 ? '·' : (char)b));
+                }
+                else
+                {
+                    byte b = dataArray[i];
+                    hexDump.AppendFormat("{0:x2} ", b);
+                    asciiDump.Append((b < 32 ? '·' : (char)b));
+                }
+            }
+
+            string msg = String.Format(
+                "Packet [{0}] - {1}[{2}] {3} {4} ({5} bytes)\n\n" +
+                "{6}\n\n" +
+                "{7}\n\n" +
+                "{8}\n" +
+                "-----------------------------------------------------------\n\n",
+                name,
+                id,
+                "0x" + data.GetId().ToString("X4"),
+                dir,
+                (src == 'A' ? "Auth" : "Game"),
+                dataArray.Length,
+                hexDump.ToString(),
+                asciiDump.ToString(),
+                str
+            );
+            File.AppendAllText(logFile, msg);
+        }
 
         private void packets_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
