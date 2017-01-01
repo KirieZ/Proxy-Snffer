@@ -14,17 +14,17 @@ namespace RappelzSniffer
         #endregion
 
         #region Server Configuration
-        public static string Auth_ServerIp = "77.161.174.249";
-		public static string Auth_ClientIp = "127.0.0.1";
+        public static string Auth_ServerIp = "182.162.85.10"; //77.161.174.249
+        public static string Auth_ClientIp = "127.0.0.1";
 
-		public static string Game_ServerIp = "77.161.174.249";
+		public static string Game_ServerIp = "182.162.85.10";
 		public static string Game_ClientIp = "127.0.0.1";
 
-		public static ushort Auth_ServerPort = 8841;
-		public static ushort Auth_ClientPort = 8842;
+		public static ushort Auth_ServerPort = 4500; //8841
+        public static ushort Auth_ClientPort = 8842; //8842
 
-		public static ushort Game_ServerPort = 6900;
-		public static ushort Game_ClientPort = 4505;
+        public static ushort Game_ServerPort = 4514; //6900
+        public static ushort Game_ClientPort = 4505; //4505
         #endregion
 
         #region PrivateKey Configuration

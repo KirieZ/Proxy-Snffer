@@ -42,31 +42,58 @@ namespace RappelzSniffer.Network
 		{
 			Dictionary<short, Packet> packets_db = new Dictionary<short, Packet>();
 
-			packets_db.Add(0x0000, new Packet() { func = GamePackets.send_PacketResponse });
-			packets_db.Add(0x0001, new Packet() { func = GamePackets.parse_JoinGame });
-			packets_db.Add(0x0002, new Packet() { func = GamePackets.packet2 });
-			packets_db.Add(0x0003, new Packet() { func = GamePackets.send_EntityAck });
-			packets_db.Add(0x0004, new Packet() { func = GamePackets.send_LoginResult });
-			packets_db.Add(0x0005, new Packet() { func = GamePackets.parse_PCMoveReq });
-			packets_db.Add(0x0007, new Packet() { func = GamePackets.parse_PCMoveUpdt });
-			packets_db.Add(0x0008, new Packet() { func = GamePackets.send_PCMove });
-			packets_db.Add(0x000A, new Packet() { func = GamePackets.send_A });
-			packets_db.Add(0x000B, new Packet() { func = GamePackets.send_RegionAck });
-			packets_db.Add(0x0014, new Packet() { func = GamePackets.parse_Chat });
-			packets_db.Add(0x0015, new Packet() { func = GamePackets.send_Chat });
-			packets_db.Add(0x0016, new Packet() { func = GamePackets.parse_Scripts });
-			packets_db.Add(0x0017, new Packet() { func = GamePackets.parse_LogoutToChar });
-			packets_db.Add(0x0019, new Packet() { func = GamePackets.parse_LogoutToCharCheck });
-			packets_db.Add(0x001A, new Packet() { func = GamePackets.parse_QuitGameCheck });
-			packets_db.Add(0x001B, new Packet() { func = GamePackets.parse_QuitGame });
+            #region Packets 0 to 16
+            packets_db.Add(0x0000, new Packet() { func = GamePackets.TS_SC_RESULT });
+			packets_db.Add(0x0001, new Packet() { func = GamePackets.TS_CS_LOGIN });
+			packets_db.Add(0x0002, new Packet() { func = GamePackets.TS_TIMESYNC });
+			packets_db.Add(0x0003, new Packet() { func = GamePackets.TS_SC_ENTER });
+			packets_db.Add(0x0004, new Packet() { func = GamePackets.TS_SC_LOGIN_RESULT });
+			packets_db.Add(0x0005, new Packet() { func = GamePackets.TS_CS_MOVE_REQUEST });
+            packets_db.Add(0x0006, new Packet() { func = GamePackets.TS_SC_MOVE_ACK });
+            packets_db.Add(0x0007, new Packet() { func = GamePackets.TS_CS_REGION_UPDATE });
+			packets_db.Add(0x0008, new Packet() { func = GamePackets.TS_SC_MOVE });
+            packets_db.Add(0x0009, new Packet() { func = GamePackets.TS_SC_LEAVE });
+            packets_db.Add(0x000A, new Packet() { func = GamePackets.TS_SC_SET_TIME });
+			packets_db.Add(0x000B, new Packet() { func = GamePackets.TS_SC_REGION_ACK });
+            packets_db.Add(0x000C, new Packet() { func = GamePackets.TS_SC_WARP });
+            packets_db.Add(0x000D, new Packet() { func = GamePackets.TS_CS_QUERY });
+            packets_db.Add(0x000F, new Packet() { func = GamePackets.TS_CS_ENTER_EVENT_AREA });
+            packets_db.Add(0x0010, new Packet() { func = GamePackets.TS_CS_LEAVE_EVENT_AREA });
+            #endregion
+            #region Packets 20 to 150
+            packets_db.Add(0x0014, new Packet() { func = GamePackets.TS_CS_CHAT_REQUEST });
+			packets_db.Add(0x0015, new Packet() { func = GamePackets.TS_SC_CHAT_LOCAL });
+			packets_db.Add(0x0016, new Packet() { func = GamePackets.TS_SC_CHAT });
+			packets_db.Add(0x0017, new Packet() { func = GamePackets.TS_CS_RETURN_LOBBY });
+            //18 TS_SC_CHAT_RESULT
+            packets_db.Add(0x0019, new Packet() { func = GamePackets.TS_CS_REQUEST_RETURN_LOBBY });
+			packets_db.Add(0x001A, new Packet() { func = GamePackets.TS_CS_REQUEST_LOGOUT });
+			packets_db.Add(0x001B, new Packet() { func = GamePackets.TS_CS_LOGOUT });
+            //1c TS_SC_DISCONNECT_DESC
+            //1e TS_SC_CHANGE_NAME
+            //1f TS_CS_CHANGE_ALIAS
+            packets_db.Add(0x0033, new Packet() { func = GamePackets.TS_CS_VERSION });
+            //35 TS_SC_ANTI_HACK
+            //36 TS_CS_ANTI_HACK
+            packets_db.Add(0x0037, new Packet() { func = GamePackets.TS_SC_GAME_GUARD_AUTH_QUERY });
+            //38 TS_CS_GAME_GUARD_AUTH_ANSWER
+            //39 TS_CS_CHECK_ILLEGAL_USER
+            //3a TS_SC_XTRAP_CHECK
+            //3b TS_CS_XTRAP_CHECK
+            //3d TS_CS_LOGIN_2
+            //3e TS_CS_LOGIN_3
+            //3f TS_SC_ENTER_2
+            //40 TS_SC_LOGIN_RESULT_2
+            //41 TS_CS_MOVE_REQUEST_2
+            //43 TS_CS_REGION_UPDATE_2
+            packets_db.Add(0x0064, new Packet() { func = GamePackets.TS_CS_ATTACK_REQUEST });
+			packets_db.Add(0x0065, new Packet() { func = GamePackets.TS_SC_ATTACK_EVENT });
+            //66 TS_SC_CANT_ATTACK
+            //67 TS_SC_DOUBLE_WEAPON_ATTACK_EVENT
+            //96 TS_CS_CANCEL_ACTION
+            #endregion
 
-			packets_db.Add(0x0033, new Packet() { func = GamePackets.parse_ClientVersion });
-			packets_db.Add(0x0037, new Packet() { func = GamePackets.send_37 });
-
-			packets_db.Add(0x0064, new Packet() { func = GamePackets.parse_PCAttack });
-			packets_db.Add(0x0065, new Packet() { func = GamePackets.send_Attack });
-
-			packets_db.Add(0x00C8, new Packet() { func = GamePackets.parse_Equip });
+            packets_db.Add(0x00C8, new Packet() { func = GamePackets.parse_Equip });
 			packets_db.Add(0x00C9, new Packet() { func = GamePackets.parse_Unequip });
 			packets_db.Add(0x00CA, new Packet() { func = GamePackets.send_CharView });
 			packets_db.Add(0x00CF, new Packet() { func = GamePackets.send_InventoryList });

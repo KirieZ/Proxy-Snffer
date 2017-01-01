@@ -96,7 +96,7 @@ namespace RappelzSniffer.Network
 			return stream;
 		}
 
-		internal static void parse_JoinGame(ref PacketStream stream)
+		internal static void TS_CS_LOGIN(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -109,9 +109,77 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_PCMoveReq(ref PacketStream stream)
+        internal static void TS_SC_WARP(ref PacketStream stream)
+        {
+            //#define TS_SC_WARP_DEF(_) \
+            //            _(simple)(float, x) \
+            //	_(simple)(float, y) \
+            //	_(simple)(float, z) \
+            //	_(simple)(char, layer)
+        }
+
+        internal static void TS_CS_QUERY(ref PacketStream stream)
+        {
+            //        define TS_CS_QUERY_DEF(_) \
+            //_(simple)(uint32_t, handle)
+        }
+
+
+        internal static void TS_CS_ENTER_EVENT_AREA(ref PacketStream stream)
+        {
+            //#define TS_CS_ENTER_EVENT_AREA_DEF(_) \
+            //            _(simple)(int32_t, event_area_id) \
+            //	_(simple)(int32_t, area_index)
+
+        }
+
+        internal static void TS_CS_LEAVE_EVENT_AREA(ref PacketStream stream)
+        {
+            //#define TS_CS_LEAVE_EVENT_AREA_DEF(_) \
+            //            _(simple)(int32_t, event_area_id) \
+            //	_(simple)(int32_t, area_index)
+        }
+
+        internal static void TS_SC_MOVE_ACK(ref PacketStream stream)
+        {
+            //#define TS_SC_MOVE_ACK_DEF(_) \
+            //            _(simple)(uint32_t, time) \
+            //	_(simple)(char, speed)
+            // *** NOTE : IT CAN BE A DUMMY AS STATED BELOW, BUT U CAN ALSO TRY THE EFFORT AND FILL TIME,SPEED ***
+            //CREATE_PACKET(TS_SC_MOVE_ACK, 6);
+        }
+
+        internal static void TS_SC_LEAVE(ref PacketStream stream)
+        {
+
+            //#define TS_SC_LEAVE_DEF(_) \
+            //            _(simple)(uint32_t, handle)
+        }
+
+
+
+        internal static void TS_CS_MOVE_REQUEST(ref PacketStream stream)
 		{
-			StringBuilder str = new StringBuilder();
+            //#define MOVE_REQUEST_INFO_DEF(_) \
+            //            _(simple)(float, tx) \
+            //	_(simple)(float, ty)
+
+            //CREATE_STRUCT(MOVE_REQUEST_INFO);
+
+            //#define TS_CS_MOVE_REQUEST_DEF(_) \
+            //            _(simple)(uint32_t, handle) \
+            //	_(simple)(float, x) \
+            //	_(simple)(float, y) \
+            //	_(simple)(uint32_t, cur_time) \
+            //	_(simple)(bool, speed_sync) \
+            //	_(count)(uint16_t, count, move_infos) \
+            //	_(dynarray)(MOVE_REQUEST_INFO, move_infos)
+
+            //#define TS_CS_MOVE_REQUEST_ID(X) \
+            //            X(5, version < EPIC_9_2) \
+            //	X(65, version >= EPIC_9_2)
+
+            StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
@@ -138,7 +206,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_PCMoveUpdt(ref PacketStream stream)
+		internal static void TS_CS_REGION_UPDATE(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -155,7 +223,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_Chat(ref PacketStream stream)
+		internal static void TS_CS_CHAT_REQUEST(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -173,7 +241,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_LogoutToChar(ref PacketStream stream)
+		internal static void TS_CS_RETURN_LOBBY(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -185,7 +253,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_LogoutToCharCheck(ref PacketStream stream)
+		internal static void TS_CS_REQUEST_RETURN_LOBBY(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -197,7 +265,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_QuitGameCheck(ref PacketStream stream)
+		internal static void TS_CS_REQUEST_LOGOUT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -209,7 +277,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_QuitGame(ref PacketStream stream)
+		internal static void TS_CS_LOGOUT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -497,24 +565,207 @@ namespace RappelzSniffer.Network
 
 		//========== Send
 
-		internal static void send_PacketResponse(ref PacketStream stream)
+		internal static void TS_SC_RESULT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int16 packet_id = " + stream.ReadInt16());
-			str.AppendLine("	Int16 response = " + stream.ReadInt16());
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
-			str.AppendLine("}");
+			str.AppendLine("	Int16 request_msg_id = " + stream.ReadInt16());
+			str.AppendLine("	Int16 result = " + stream.ReadInt16());
+			str.AppendLine("	UInt32 value = " + stream.ReadUInt32());
+            //static const uint16_t packetID = 0;
+            str.AppendLine("}");
 
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_EntityAck(ref PacketStream stream)
+		internal static void TS_SC_ENTER(ref PacketStream stream)
 		{
-			StringBuilder str = new StringBuilder();
+            //            enum TS_SC_ENTER__OBJ_TYPE : uint8_t
+            //        {
+            //            EOT_Player,
+            //            EOT_NPC,
+            //            EOT_Item,
+            //            EOT_Monster,
+            //            EOT_Summon,
+            //            EOT_Skill,
+            //            EOT_FieldProp,
+            //            EOT_Pet
+            //        };
+
+            //#define TS_SC_ENTER__ITEM_PICK_UP_ORDER_DEF(_) \
+            //    _(simple) (uint32_t, drop_time) \
+
+            //    _(array)  (uint32_t, hPlayer, 3) \
+
+            //    _(array)  (int32_t, nPartyID, 3)
+            //CREATE_STRUCT(TS_SC_ENTER__ITEM_PICK_UP_ORDER);
+
+            //#define TS_SC_ENTER__ITEM_INFO_DEF(_) \
+            //    _(simple) (EncodedInt<EncodingRandomized>, code) \
+
+            //    _(simple) (uint64_t, count) \
+
+            //    _(simple) (TS_SC_ENTER__ITEM_PICK_UP_ORDER, pick_up_order)
+            //CREATE_STRUCT(TS_SC_ENTER__ITEM_INFO);
+
+            //#define TS_SC_ENTER__SKILL_INFO_DEF(_) \
+            //    _(simple) (uint32_t, casterHandle) \
+
+            //    _(simple) (uint32_t, startTime) \
+
+            //    _(simple) (uint32_t, skillId)
+            //CREATE_STRUCT(TS_SC_ENTER__SKILL_INFO);
+
+            //#define TS_SC_ENTER__FIELD_PROP_INFO_DEF(_) \
+            //    _(simple) (uint32_t, prop_id) \
+
+            //    _(simple) (float, fZOffset) \
+
+            //    _(simple) (float, fRotateX) \
+
+            //    _(simple) (float, fRotateY) \
+
+            //    _(simple) (float, fRotateZ) \
+
+            //    _(simple) (float, fScaleX) \
+
+            //    _(simple) (float, fScaleY) \
+
+            //    _(simple) (float, fScaleZ) \
+
+            //    _(simple) (bool, bLockHeight) \
+
+            //    _(simple) (float, fLockHeight)
+            //CREATE_STRUCT(TS_SC_ENTER__FIELD_PROP_INFO);
+
+            //#define TS_SC_ENTER__CREATURE_INFO_DEF(_) \
+            //    _(simple) (uint32_t, status) \
+
+            //    _(simple) (float, face_direction) \
+
+            //    _(simple) (int32_t, hp) \
+
+            //    _(simple) (int32_t, max_hp) \
+
+            //    _(simple) (int32_t, mp) \
+
+            //    _(simple) (int32_t, max_mp) \
+
+            //    _(simple) (int32_t, level) \
+
+            //    _(simple) (uint8_t, race) \
+
+            //    _(simple) (uint32_t, skin_color) \
+
+            //    _(simple) (bool, is_first_enter) \
+
+            //    _(simple) (int32_t, energy)
+            //CREATE_STRUCT(TS_SC_ENTER__CREATURE_INFO);
+
+            //#define TS_SC_ENTER__MONSTER_INFO_DEF(_) \
+            //    _(simple) (TS_SC_ENTER__CREATURE_INFO, creatureInfo) \
+
+            //    _(simple) (EncodedInt<EncodingScrambled>, monster_id) \
+
+            //    _(simple) (bool, is_tamed)
+            //CREATE_STRUCT(TS_SC_ENTER__MONSTER_INFO);
+
+            //#define TS_SC_ENTER__SUMMON_INFO_DEF(_) \
+            //    _(simple) (TS_SC_ENTER__CREATURE_INFO, creatureInfo) \
+
+            //    _(simple) (uint32_t, master_handle) \
+
+            //    _(simple) (EncodedInt<EncodingRandomized>, summon_code) \
+
+            //    _(string) (szName, 19) \
+
+            //    _(simple) (uint8_t, enhance)
+            //CREATE_STRUCT(TS_SC_ENTER__SUMMON_INFO);
+
+            //#define TS_SC_ENTER__NPC_INFO_DEF(_) \
+            //    _(simple) (TS_SC_ENTER__CREATURE_INFO, creatureInfo) \
+
+            //    _(simple) (EncodedInt<EncodingRandomized>, npc_id)
+            //CREATE_STRUCT(TS_SC_ENTER__NPC_INFO);
+
+            //#define TS_SC_ENTER__PLAYER_INFO_DEF(_) \
+            //    _(simple) (TS_SC_ENTER__CREATURE_INFO, creatureInfo) \
+
+            //    _(simple) (uint8_t, sex) \
+
+            //    _(simple) (uint32_t, faceId) \
+
+            //    _(simple) (uint32_t, faceTextureId) \
+
+            //    _(simple) (uint32_t, hairId) \
+
+            //    _(simple) (uint32_t, hairColorIndex) \
+
+            //    _(simple) (uint32_t, hairColorRGB) \
+
+            //    _(simple) (uint32_t, hideEquipFlag) \
+
+            //    _(string) (szName, 19) \
+
+            //    _(simple) (uint16_t, job_id) \
+
+            //    _(simple) (uint32_t, ride_handle) \
+
+            //    _(simple) (uint32_t, guild_id) \
+
+            //    _(simple) (uint64_t, unknown, version >= EPIC_9_2)
+            //CREATE_STRUCT(TS_SC_ENTER__PLAYER_INFO);
+
+            //#define TS_SC_ENTER__PET_INFO_DEF(_) \
+            //    _(simple) (TS_SC_ENTER__CREATURE_INFO, creatureInfo) \
+
+            //    _(simple) (uint32_t, master_handle) \
+
+            //    _(simple) (EncodedInt<EncodingRandomized>, pet_code) \
+
+            //    _(string) (szName, 19)
+            //CREATE_STRUCT(TS_SC_ENTER__PET_INFO);
+
+            //#define TS_SC_ENTER_DEF(_) \
+            //    _(simple) (uint8_t, type) /* 0 = static object, 1 = movable object, 2 = client object (ArObject::ObjectType) */ \
+
+            //    _(simple) (uint32_t, handle) \
+
+            //    _(simple) (float, x) \
+
+            //    _(simple) (float, y) \
+
+            //    _(simple) (float, z) \
+
+            //    _(simple) (uint8_t, layer) \
+
+            //    _(simple) (TS_SC_ENTER__OBJ_TYPE, objType) \
+
+            //    _(simple) (TS_SC_ENTER__PLAYER_INFO    , playerInfo   , objType == EOT_Player) \
+
+            //    _(simple) (TS_SC_ENTER__NPC_INFO       , npcInfo      , objType == EOT_NPC) \
+
+            //    _(simple) (TS_SC_ENTER__ITEM_INFO      , itemInfo     , objType == EOT_Item) \
+
+            //    _(simple) (TS_SC_ENTER__MONSTER_INFO   , monsterInfo  , objType == EOT_Monster) \
+
+            //    _(simple) (TS_SC_ENTER__SUMMON_INFO    , summonInfo   , objType == EOT_Summon) \
+
+            //    _(simple) (TS_SC_ENTER__SKILL_INFO     , skillInfo    , objType == EOT_Skill) \
+
+            //    _(simple) (TS_SC_ENTER__FIELD_PROP_INFO, fieldPropInfo, objType == EOT_FieldProp) \
+
+            //    _(simple) (TS_SC_ENTER__PET_INFO       , petInfo      , objType == EOT_Pet)
+
+            //#define TS_SC_ENTER_ID(X) \
+            //    X(3, version<EPIC_9_2) \
+            //    X(63, version >= EPIC_9_2)
+
+            //CREATE_PACKET_VER_ID(TS_SC_ENTER);
+        StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
@@ -644,9 +895,25 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_PCMove(ref PacketStream stream)
+		internal static void TS_SC_MOVE(ref PacketStream stream)
 		{
-			StringBuilder str = new StringBuilder();
+            //#define MOVE_INFO_DEF(_) \
+            //            _(simple)(float, tx) \
+            //	_(simple)(float, ty)
+
+            //CREATE_STRUCT(MOVE_INFO);
+
+            //#define TS_SC_MOVE_DEF(_) \
+            //            _(simple)(uint32_t, start_time) \
+            //	_(simple)(uint32_t, handle) \
+            //	_(simple)(char, tlayer) \
+            //	_(simple)(char, speed) \
+            //	_(count)(uint16_t, count, move_infos) \
+            //	_(dynarray)(MOVE_INFO, move_infos)
+
+
+
+            StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
@@ -672,7 +939,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 	}
 
-		internal static void send_RegionAck(ref PacketStream stream)
+		internal static void TS_SC_REGION_ACK(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -960,9 +1227,14 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void packet2(ref PacketStream stream)
+		internal static void TS_TIMESYNC(ref PacketStream stream)
 		{
-			StringBuilder str = new StringBuilder();
+            //struct TS_TIMESYNC : public TS_MESSAGE
+            //{
+	        // uint32_t time;
+            //        static const int packetID = 2;
+            //    };
+    StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
@@ -976,7 +1248,7 @@ namespace RappelzSniffer.Network
 				Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
 		}
 
-		internal static void parse_ClientVersion(ref PacketStream stream)
+		internal static void TS_CS_VERSION(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -1066,9 +1338,45 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
 		}
 
-		internal static void send_LoginResult(ref PacketStream stream)
+		internal static void TS_SC_LOGIN_RESULT(ref PacketStream stream)
 		{
-			StringBuilder str = new StringBuilder();
+            //#define TS_SC_LOGIN_RESULT_DEF(_) \
+            //            _(simple)(def)(uint16_t, result) \
+            //	_(simple)(impl)(uint16_t, result, version >= EPIC_7_1) \
+            //	_(simple)(impl)(uint8_t, result, version < EPIC_7_1) \
+            //	_(simple)(uint32_t, handle) \
+            //	_(simple)(float, x) \
+            //	_(simple)(float, y) \
+            //	_(simple)(float, z) \
+            //	_(simple)(uint8_t, layer) \
+            //	_(simple)(float, face_direction) \
+            //	_(simple)(int32_t, region_size) \
+            //	_(simple)(int32_t, hp) \
+            //	_(simple)(def)(int32_t, mp) \
+            //	_(simple)(impl)(int32_t, mp, version >= EPIC_7_1) \
+            //	_(simple)(impl)(int16_t, mp, version < EPIC_7_1) \
+            //	_(simple)(int32_t, max_hp) \
+            //	_(simple)(def)(int32_t, max_mp) \
+            //	_(simple)(impl)(int32_t, max_mp, version >= EPIC_7_1) \
+            //	_(simple)(impl)(int16_t, max_mp, version < EPIC_7_1) \
+            //	_(simple)(int32_t, havoc, version >= EPIC_4_1 && version < EPIC_9_2) \
+            //	_(simple)(int32_t, max_havoc, version >= EPIC_4_1 && version < EPIC_9_2) \
+            //	_(simple)(int32_t, sex) \
+            //	_(simple)(int32_t, race) \
+            //	_(simple)(uint32_t, skin_color, version >= EPIC_4_1) \
+            //	_(simple)(int32_t, faceId) \
+            //	_(simple)(int32_t, hairId) \
+            //	_(string)(name, 19) \
+            //	_(simple)(int32_t, cell_size) \
+            //	_(simple)(int32_t, guild_id, version >= EPIC_5_1) \
+            //	_(simple)(int32_t, unknown, version >= EPIC_9_2)
+
+            //#define TS_SC_LOGIN_RESULT_ID(X) \
+            //            X(4, version < EPIC_9_2) \
+            //	X(64, version >= EPIC_9_2)
+
+
+            StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
@@ -1101,21 +1409,21 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_A(ref PacketStream stream)
+		internal static void TS_SC_SET_TIME(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	UInt32 unknown = " + stream.ReadUInt32());
+			str.AppendLine("	UInt32 gap = " + stream.ReadUInt32());
 
 			str.AppendLine("}");
 
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_Scripts(ref PacketStream stream)
+		internal static void TS_SC_CHAT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -1131,7 +1439,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_37(ref PacketStream stream)
+		internal static void TS_SC_GAME_GUARD_AUTH_QUERY(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -1437,7 +1745,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void parse_PCAttack(ref PacketStream stream)
+		internal static void TS_CS_ATTACK_REQUEST(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -1451,7 +1759,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_Attack(ref PacketStream stream)
+		internal static void TS_SC_ATTACK_EVENT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
@@ -1504,7 +1812,7 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
 		}
 
-		internal static void send_Chat(ref PacketStream stream)
+		internal static void TS_SC_CHAT_LOCAL(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
