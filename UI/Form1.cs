@@ -21,6 +21,8 @@ namespace RappelzSniffer
 
         private const string logFile = "packet_dump.log";
 
+        private static Object _FileLocker = new object();
+
         public Form1()
 		{
 			InitializeComponent();
@@ -144,7 +146,11 @@ namespace RappelzSniffer
                 asciiDump.ToString(),
                 str
             );
-            File.AppendAllText(logFile, msg);
+
+            lock (_FileLocker)
+            {
+                File.AppendAllText(logFile, msg);
+            }
         }
 
         private void packets_CellClick(object sender, DataGridViewCellEventArgs e)

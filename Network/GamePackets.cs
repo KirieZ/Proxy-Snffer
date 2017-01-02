@@ -11,53 +11,11 @@ namespace RappelzSniffer.Network
 	public static class GamePackets
 	{
 		private static Dictionary<short, Packets.Packet> packet_db;
-		private static Dictionary<short, string> packet_names;
 		private static char Src = ' ';
 
 		static GamePackets()
 		{
 			packet_db = Packets.LoadGamePackets();
-			LoadPacketNames();
-		}
-
-		static void LoadPacketNames()
-		{
-			packet_names = new Dictionary<short, string>();
-			if (File.Exists("packets/game_packets.txt"))
-			{
-				string[] lines = File.ReadAllLines("packets/game_packets.txt");
-
-				for (int i = 0; i < lines.Length; i++)
-				{
-					if (lines[i].StartsWith("//")) continue;
-					else if (!lines[i].Contains('=')) continue;
-
-					string[] val = lines[i].Split('=');
-					short id;
-					if (!short.TryParse(val[0].Trim(' '), out id))
-					{
-						// If can't convert from int, try Hex (0x)
-						try
-						{
-							id = (short)new System.ComponentModel.Int16Converter().ConvertFromString(val[0].Trim(' '));
-						}
-						catch (Exception)
-						{
-							continue;
-						}
-					}
-
-					if (!packet_names.ContainsKey(id))
-					{
-						packet_names.Add(id, val[1].TrimStart(' '));
-					}
-				}
-			}
-		}
-
-		internal static string GetPacketName(short id)
-		{
-			return (packet_names.ContainsKey(id) ? packet_names[id] : "Unknown");
 		}
 
 		internal static PacketStream PacketReceived(char src, PacketStream stream)
@@ -70,27 +28,14 @@ namespace RappelzSniffer.Network
 			short PacketId = stream.GetId();
 			stream.ReadByte();
 
-			/*if (!packet_db.ContainsKey(PacketId))
-			{
-				ConsoleUtils.HexDump(stream.ToArray(), "Unknown Packet Received", PacketId, stream.GetSize());
-				return;
-			}
-
-			ConsoleUtils.HexDump(
-				stream.ToArray(),
-				"Packet Received",
-				PacketId,
-				stream.GetSize()
-			);*/
-
 			if (packet_db.ContainsKey(PacketId))
 				packet_db[PacketId].func(ref stream);
 			else
 			{
 				if (src == 'S')
-					Form1.PacketRecv('G', GetPacketName(PacketId), stream);
+					Form1.PacketRecv('G', "Unknown", stream);
 				else
-					Form1.PacketSend('G', GetPacketName(PacketId), stream);
+					Form1.PacketSend('G', "Unknown", stream);
 			}
 
 			return stream;
@@ -99,20 +44,20 @@ namespace RappelzSniffer.Network
 		internal static void parse_JoinGame(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(19) CharName = " + stream.ReadString(0, 19));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_PCMoveReq(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -135,13 +80,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_PCMoveUpdt(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -152,13 +97,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte stop = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Chat(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -170,61 +115,61 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(len) Command = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_LogoutToChar(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_LogoutToCharCheck(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_QuitGameCheck(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_QuitGame(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Equip(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -232,13 +177,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	4B Unknown = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Unequip(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -246,13 +191,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte Unknown = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_WearChange(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -266,13 +211,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	2B Unknown = " + stream.ReadInt16());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_SetProperty(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -280,26 +225,26 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(?S)  = " + stream.ReadString(0, stream.GetSize() - 23));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Target(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	uint target = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_ReqCharList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -307,13 +252,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte Unknown = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_CreateChar(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -372,26 +317,26 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int32 skin_color = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_DelChar(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(19) CharName = " + stream.ReadString(0, 19));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_LoginToken(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -403,27 +348,27 @@ namespace RappelzSniffer.Network
 			str.Append("\r\n");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_CharName(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(19) name = " + stream.ReadString(0, 19));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_DialOpt(ref PacketStream stream)
 		{
 			short size = stream.ReadInt16();
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -431,26 +376,26 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(size) Function = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Contact(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	Int NpcHandle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_LearnSkill(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -459,26 +404,26 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int16 target_level = " + stream.ReadInt16());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 		
 		internal static void parse_JobLevelUp(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_UseSkill(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -492,7 +437,7 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte level = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		//========== Send
@@ -500,7 +445,7 @@ namespace RappelzSniffer.Network
 		internal static void send_PacketResponse(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -509,13 +454,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_EntityAck(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -641,13 +586,13 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_PCMove(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -669,13 +614,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 	}
 
 		internal static void send_RegionAck(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -684,13 +629,13 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_Property(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -704,13 +649,13 @@ namespace RappelzSniffer.Network
 				str.AppendLine("	String(?) value = " + stream.ReadString(0, stream.GetSize() - 28));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_UpdateHPMP(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -721,13 +666,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	UInt32 new_mp = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_UpdateStatus(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -778,13 +723,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte is_temporary = " + stream.ReadByte()); /* 90 */
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_CharList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -851,13 +796,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_Dialog(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -879,13 +824,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 }
 
 		internal static void send_UrlList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -894,13 +839,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(string_length) url_list = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_MaxHPMPUpdate(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -914,13 +859,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Byte unknown = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_EntityState(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -928,13 +873,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	UInt32 state = " + stream.ReadUInt32()); /* 4 */
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_SkillList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -957,13 +902,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void packet2(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -971,105 +916,105 @@ namespace RappelzSniffer.Network
 			str.AppendLine("}");
 
 			if (Src == 'S')
-				Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream);
+				Form1.PacketRecv('G', "PacketName", stream);
 			else
-				Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+				Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_ClientVersion(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_1F7(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	UInt32 = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_226(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_384(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_44C(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_SystemSpecs(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(86) Specs = " + stream.ReadString(0, 86));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void parse_270F(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(20) Version = " + stream.ReadString(0, 20));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream);
+			Form1.PacketSend('G', "PacketName", stream);
 		}
 
 		internal static void send_LoginResult(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1098,13 +1043,13 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_A(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1112,13 +1057,13 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_Scripts(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1128,27 +1073,27 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(size) = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_37(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		
 		}
 
 		internal static void send_CharView(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1183,13 +1128,13 @@ namespace RappelzSniffer.Network
 			}
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_InventoryList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1219,13 +1164,13 @@ namespace RappelzSniffer.Network
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_BeltSlotInfo(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1237,14 +1182,14 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	UInt32 slot5_handle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		
 		}
 
 		internal static void send_194(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1252,14 +1197,14 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	2B unknown = " + stream.ReadInt16());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		
 		}
 
 		internal static void send_QuestList(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1288,13 +1233,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	}");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_QuestUpdate(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1309,14 +1254,14 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		
 		}
 
 		internal static void send_LocationInfo(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1324,13 +1269,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int32 new_location = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_WeatherInfo(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1338,13 +1283,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int16 Weather = " + stream.ReadInt16());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_UpdateGoldChaos(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1352,13 +1297,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int32 chaos = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_UpdateLevel(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1367,13 +1312,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int32 job_level = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_UpdateExp(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1382,13 +1327,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int64 jp = " + stream.ReadInt64());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_GameTime(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1396,13 +1341,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	Int64 unix_timestamp = " + stream.ReadInt64());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_OpenPopup(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1413,13 +1358,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String url = " + stream.ReadString(0, stream.GetSize() - 18));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_Unamed191(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1434,13 +1379,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	---Unknown Data---");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void parse_PCAttack(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1448,13 +1393,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	uint item_handle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_Attack(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1487,13 +1432,13 @@ namespace RappelzSniffer.Network
 			}
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_ItemDrop(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1501,13 +1446,13 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	uint item_handle = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
 		internal static void send_Chat(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + GetPacketName(stream.GetId()) + " [" + stream.GetId() + "]");
+			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
@@ -1517,7 +1462,7 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	String(size) message = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', GetPacketName(stream.GetId()), stream, str.ToString());
+			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 	}
 
