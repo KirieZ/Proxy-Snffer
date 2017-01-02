@@ -49,20 +49,20 @@ namespace RappelzSniffer.Network
             data.ReadByte();
 
             str.Append("{\r\n");
-            str.Append("	ushort LastLoginServerId = ").Append(data.ReadUInt16()).Append(";\r\n");
+            str.Append("	ushort last_login_server_id = ").Append(data.ReadUInt16()).Append(";\r\n");
             ushort svCount = data.ReadUInt16();
-            str.Append("	ushort Count = ").Append(svCount).Append(";\r\n");
-            str.Append("	struct Servers[Count]\r\n");
+            str.Append("	ushort count = ").Append(svCount).Append(";\r\n");
+            str.Append("	struct servers[Count]\r\n");
             str.Append("    {\r\n");
             for (int i = 0; i < svCount; i++)
             {
                 str.Append("		{\r\n");
-                str.Append("			ushort Index = ").Append(data.ReadUInt16()).Append("\r\n");
-                str.Append("			string(22) Name = ").Append(data.ReadString(0, 22)).Append("\r\n");
-                str.Append("			string(256) URL = ").Append(data.ReadString(0, 256)).Append("\r\n");
-                str.Append("			string(16) IP = ").Append(data.ReadString(0, 16)).Append("\r\n");
-                str.Append("			int Port = ").Append(data.ReadInt32()).Append("\r\n");
-                str.Append("			ushort UserRatio = ").Append(data.ReadInt16()).Append("\r\n");
+                str.Append("			ushort index = ").Append(data.ReadUInt16()).Append("\r\n");
+                str.Append("			string(22) name = ").Append(data.ReadString(0, 22)).Append("\r\n");
+                str.Append("			string(256) url = ").Append(data.ReadString(0, 256)).Append("\r\n");
+                str.Append("			string(16) ip = ").Append(data.ReadString(0, 16)).Append("\r\n");
+                str.Append("			int port = ").Append(data.ReadInt32()).Append("\r\n");
+                str.Append("			ushort user_ratio = ").Append(data.ReadInt16()).Append("\r\n");
                 str.Append("		}\r\n");
             }
             str.Append("    }\r\n");
@@ -109,8 +109,16 @@ namespace RappelzSniffer.Network
             pStream.ReadByte();
 
             str.Append("{\r\n");
-            str.Append("	int key_size; = ").Append(pStream.ReadInt32()).Append("\r\n");
-            str.Append("	byte key[0]; = ").Append(pStream.ReadByte()).Append("\r\n");
+            int keySize = pStream.ReadInt32();
+            str.Append("	int key_size; = ").Append(keySize).Append("\r\n");
+            str.Append("	byte key[key_size] = {\r\n      ");
+            for (int i = 0; i < keySize; i++)
+            {
+                if (i % 16 == 0)
+                    str.Append("\r\n        ");
+                str.Append(pStream.ReadByte()).Append(" ");
+            }
+            str.Append("\r\n    }");
             str.Append("	static const uint16_t packetID = 71;").Append("\r\n");
             str.Append("}\r\n");
 
@@ -125,8 +133,15 @@ namespace RappelzSniffer.Network
             pStream.ReadByte();
 
             str.Append("{\r\n");
-            str.Append("	int data_size; = ").Append(pStream.ReadInt32()).Append("\r\n");
-            str.Append("	byte rsa_encrypted_data[0]; = ").Append(pStream.ReadByte()).Append("\r\n");
+            int dataSize = pStream.ReadInt32();
+            str.Append("	int data_size; = ").Append(dataSize).Append("\r\n");
+            str.Append("	byte[] rsa_encrypted_data[data_size] = {");
+            for (int i = 0; i < dataSize; i++) {
+                if (i % 16 == 0)
+                    str.Append("\r\n        ");
+                str.Append(pStream.ReadByte()).Append(" ");
+            }
+            str.Append("\r\n    }");
             str.Append("	static const uint16_t packetID = 72;").Append("\r\n");
             str.Append("}\r\n");
 
@@ -166,8 +181,8 @@ namespace RappelzSniffer.Network
             pStream.ReadByte();
 
             str.Append("{\r\n");
-			str.Append("	String UserID = ").Append(pStream.ReadString(0, 60)).Append("\r\n");
-			str.Append("	String UserPass = ").Append(pStream.ReadString(0, 8)).Append("\r\n");
+			str.Append("	char[] user_id[60] = ").Append(pStream.ReadString(0, 60)).Append("\r\n");
+			str.Append("	char[] user_pass[8] = ").Append(pStream.ReadString(0, 8)).Append("\r\n");
 			str.Append("}");
 
 			Form1.PacketSend('A', "TS_CA_OTP_ACCOUNT", pStream, str.ToString());
@@ -192,7 +207,7 @@ namespace RappelzSniffer.Network
             pStream.ReadByte();
 
             str.Append("{\r\n");
-			str.Append("	Int16 index = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("	short index = ").Append(pStream.ReadInt16()).Append("\r\n");
 			str.Append("}");
 
 			Form1.PacketSend('A', "TS_CA_SELECT_SERVER", pStream, str.ToString());
@@ -265,9 +280,9 @@ namespace RappelzSniffer.Network
             pStream.ReadByte();
 
             str.Append("{\r\n");
-			str.Append("	Int16 PacketId = ").Append(pStream.ReadInt16()).Append("\r\n");
-			str.Append("	Int16 Result = ").Append(pStream.ReadInt16()).Append("\r\n");
-			str.Append("	Int32 Unknown = ").Append(pStream.ReadInt32()).Append("\r\n");
+			str.Append("	short packet_id = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("	short result = ").Append(pStream.ReadInt16()).Append("\r\n");
+			str.Append("	int unknown = ").Append(pStream.ReadInt32()).Append("\r\n");
 			str.Append("}");
 
 			Form1.PacketRecv('A', "TS_AC_RESULT", pStream, str.ToString());
