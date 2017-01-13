@@ -41,14 +41,15 @@ namespace RappelzSniffer.Network
 			return stream;
 		}
 
-		internal static void parse_JoinGame(ref PacketStream stream)
+		internal static void TS_LOGIN(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_LOGIN [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(19) CharName = " + stream.ReadString(0, 19));
+			str.AppendLine("	char name[19] = " + stream.ReadString(0, 19));
+            str.AppendLine("    byte race = " + stream.ReadByte());
 			str.AppendLine("}");
 
 			Form1.PacketSend('G', "PacketName", stream, str.ToString());
@@ -118,7 +119,20 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void parse_LogoutToChar(ref PacketStream stream)
+        internal static void TS_CS_VERSION(ref PacketStream stream)
+        {
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("struct TS_CS_VERSION [" + stream.GetId() + "]");
+            stream.ReadByte();
+
+            str.AppendLine("{");
+            str.AppendLine("	char version[20] = " + stream.ReadString(0, 20));
+            str.AppendLine("}");
+
+            Form1.PacketSend('G', "TS_CS_VERSION", stream, str.ToString());
+        }
+
+        internal static void parse_LogoutToChar(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
@@ -228,7 +242,34 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void parse_Target(ref PacketStream stream)
+        internal static void TS_SC_REQUEST_SECURITY_NO(ref PacketStream stream)
+        {
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("struct TS_SC_REQUEST_SECURITY_NO [" + stream.GetId() + "]");
+            stream.ReadByte();
+
+            str.AppendLine("{");
+            str.AppendLine("	int mode = " + stream.ReadInt32());
+            str.AppendLine("}");
+
+            Form1.PacketSend('G', "TS_SC_REQUEST_SECURITY_NO", stream, str.ToString());
+        }
+
+        internal static void TS_CS_SECURITY_NO(ref PacketStream stream)
+        {
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("struct TS_CS_SECURITY_NO [" + stream.GetId() + "]");
+            stream.ReadByte();
+
+            str.AppendLine("{");
+            str.AppendLine("	int mode = " + stream.ReadInt32());
+            str.AppendLine("    char security_no[19] = " + stream.ReadString(0, 19));
+            str.AppendLine("}");
+
+            Form1.PacketSend('G', "TS_CS_SECURITY_NO", stream, str.ToString());
+        }
+
+        internal static void parse_Target(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
 			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
@@ -241,127 +282,125 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void parse_ReqCharList(ref PacketStream stream)
+		internal static void TS_CS_CHARACTER_LIST(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_CS_CHARACTER_LIST [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(60) userId = " + stream.ReadString(0, 60));
-			str.AppendLine("	Byte Unknown = " + stream.ReadByte());
+			str.AppendLine("	char account[61] = " + stream.ReadString(0, 61));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_CS_CHARACTER_LIST", stream, str.ToString());
 		}
 
-		internal static void parse_CreateChar(ref PacketStream stream)
+		internal static void TS_CS_CREATE_CHARACTER(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_CS_CREATE_CHARACTER [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int32 sex = " + stream.ReadInt32());
-			str.AppendLine("	Int32 race = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hair_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 face_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 body_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hands_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 feet_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hair_color = " + stream.ReadInt32());
+            str.AppendLine("    LOBBY_CHARACTER_INFO info = {");
+            str.AppendLine("        ModelInfo model_info = {");
+			str.AppendLine("	        int sex = " + stream.ReadInt32());
+			str.AppendLine("	        int race = " + stream.ReadInt32());
+            str.AppendLine("	        int model_id[5] = {");
+            str.AppendLine("                " + stream.ReadInt32() +", " + stream.ReadInt32() + ", "+ stream.ReadInt32() +", " + stream.ReadInt32() + ", " + stream.ReadInt32() + ", " + stream.ReadInt32());
+            str.AppendLine("            };");
+			str.AppendLine("	        int texture_id = " + stream.ReadInt32());
+            str.AppendLine("	        int wear_info[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.Append("\r\n	            ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("            };");
+            str.AppendLine("        };");
+			str.AppendLine("	    int level = " + stream.ReadInt32());
+            str.AppendLine("	    int job = " + stream.ReadInt32());
+			str.AppendLine("	    int job_level = " + stream.ReadInt32());
+			str.AppendLine("	    int exp_percentage = " + stream.ReadInt32());
+            str.AppendLine("	    int hp = " + stream.ReadInt32());
+			str.AppendLine("	    int mp = " + stream.ReadInt32());
+			str.AppendLine("	    int permission = " + stream.ReadInt32());
+			str.AppendLine("        bool is_banned = " + stream.ReadBool());
+			str.AppendLine("    	char name[19] = " + stream.ReadString(0, 19));
 
-			// 32 ~ 39
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
+            str.AppendLine("	    uint skin_color = " + stream.ReadUInt32());
+            str.AppendLine("	    char szCreateTime[30] = " + stream.ReadString(0, 30));
+            str.AppendLine("	    char szDeleteTime[30] = " + stream.ReadString(0, 30));
+            str.AppendLine("	    int wear_item_enhance_info[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.Append("\r\n	        ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("        };");
+            str.AppendLine("	    int wear_item_level_info[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.Append("\r\n	        ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("        };");
+            str.AppendLine("	    byte wear_item_elemental_type[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.Append("\r\n	        ");
+                str.Append(stream.ReadByte() + " ");
+            }
+            str.AppendLine("        };");
+            str.AppendLine("    };");
+            str.AppendLine("}");
 
-			str.AppendLine("	Int32 face_detail = " + stream.ReadInt32());
-
-			// 44 ~ 51
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-
-			str.AppendLine("	Int32 clothes_id = " + stream.ReadInt32());
-
-			// 56 ~ 168
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-			str.AppendLine("	4B Unknown = " + stream.ReadInt32());
-
-			str.AppendLine("	String(19) name = " + stream.ReadString(0, 19));
-			str.AppendLine("	Int32 skin_color = " + stream.ReadInt32());
-			str.AppendLine("}");
-
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_CS_CREATE_CHARACTER", stream, str.ToString());
 		}
 
-		internal static void parse_DelChar(ref PacketStream stream)
+		internal static void TS_CS_DELETE_CHARACTER(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_CS_DELETE_CHARACTER [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(19) CharName = " + stream.ReadString(0, 19));
-			str.AppendLine("}");
+			str.AppendLine("	char name[19] = " + stream.ReadString(0, 19));
+            str.AppendLine("	char security_no[19] = " + stream.ReadString(0, 19));
+            str.AppendLine("}");
 
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_CS_DELETE_CHARACTER", stream, str.ToString());
 		}
 
-		internal static void parse_LoginToken(ref PacketStream stream)
+		internal static void TS_CS_ACCOUNT_WITH_AUTH(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_CS_ACCOUNT_WITH_AUTH [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(60) = " + stream.ReadString(0, 60));
-			str.AppendLine("	Byte Unknown = " + stream.ReadByte());
-			str.Append("	Byte[8] Token = ");
-			for (int i = 0; i < 8; i++)
-				str.Append(stream.ReadByte() + " ");
-			str.Append("\r\n");
+			str.AppendLine("	char account[61] = " + stream.ReadString(0, 61));
+			str.AppendLine("	long one_time_key = " + stream.ReadInt64());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_CS_ACCOUNT_WITH_AUTH", stream, str.ToString());
 		}
 
-		internal static void parse_CharName(ref PacketStream stream)
+		internal static void TS_CS_CHECK_CHARACTER_NAME(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_CS_CHECK_CHARACTER_NAME [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			str.AppendLine("	String(19) name = " + stream.ReadString(0, 19));
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_CS_CHECK_CHARACTER_NAME", stream, str.ToString());
 		}
 
 		internal static void parse_DialOpt(ref PacketStream stream)
@@ -442,19 +481,19 @@ namespace RappelzSniffer.Network
 
 		//========== Send
 
-		internal static void send_PacketResponse(ref PacketStream stream)
+		internal static void TS_SC_RESULT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_RESULT [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int16 packet_id = " + stream.ReadInt16());
-			str.AppendLine("	Int16 response = " + stream.ReadInt16());
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	ushort request_msg_id = " + stream.ReadInt16());
+			str.AppendLine("	ushort result = " + stream.ReadInt16());
+			str.AppendLine("	int value = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_RESULT", stream, str.ToString());
 		}
 
 		internal static void send_EntityAck(ref PacketStream stream)
@@ -632,24 +671,23 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void send_Property(ref PacketStream stream)
+		internal static void TS_SC_PROPERTY(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_PROPERTY [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	UInt32 player_handle = " + stream.ReadUInt32());
-			bool as_int = stream.ReadBool();
-			str.AppendLine("	Byte AsInt = " + as_int);
-			str.AppendLine("	String(16) property_name = " + stream.ReadString(0, 16));
-			str.AppendLine("	Int32 value = " + stream.ReadInt32());
-			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
-			if (!as_int)
-				str.AppendLine("	String(?) value = " + stream.ReadString(0, stream.GetSize() - 28));
+			str.AppendLine("	uint handle = " + stream.ReadUInt32());
+			bool is_number = stream.ReadBool();
+			str.AppendLine("	bool is_number = " + is_number);
+			str.AppendLine("	char name[16] = " + stream.ReadString(0, 16));
+			str.AppendLine("	long value = " + stream.ReadInt64());
+			if (!is_number)
+				str.AppendLine("	char value[PacketSize - 28] = " + stream.ReadString(0, stream.GetSize() - 28));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_PROPERTY", stream, str.ToString());
 		}
 
 		internal static void send_UpdateHPMP(ref PacketStream stream)
@@ -669,134 +707,113 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void send_UpdateStatus(ref PacketStream stream)
+		internal static void TS_SC_STAT_INFO(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_STAT_INFO [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32()); /* 0 */
-			str.AppendLine("	Int16 unknown1 = " + stream.ReadInt16());
-			str.AppendLine("	Int16 strenght = " + stream.ReadInt16()); /* 6 */
-			str.AppendLine("	Int16 vitality = " + stream.ReadInt16()); /* 8 */
-			str.AppendLine("	Int16 dexterity = " + stream.ReadInt16()); /* 10 */
-			str.AppendLine("	Int16 agility = " + stream.ReadInt16()); /* 12 */
-			str.AppendLine("	Int16 int = " + stream.ReadInt16()); /* 14 */
-			str.AppendLine("	Int16 wisdom = " + stream.ReadInt16()); /* 16 */
-			str.AppendLine("	Int16 luck = " + stream.ReadInt16()); /* 18 */
-			str.AppendLine("	Int16 crit_rate = " + stream.ReadInt16()); /* 20 */
-			str.AppendLine("	Int16 crit_power = " + stream.ReadInt16()); /* 22 */
-			str.AppendLine("	Int16 p_atk_right = " + stream.ReadInt16()); /* 24 */
-			str.AppendLine("	Int16 p_atk_left = " + stream.ReadInt16()); /* 26 */
-			str.AppendLine("	Int16 p_def = " + stream.ReadInt16());/* 28 */
-			str.AppendLine("	Int16 block_def = " + stream.ReadInt16());/* 30 */
-			str.AppendLine("	Int16 matk = " + stream.ReadInt16());/* 32 */
-			str.AppendLine("	Int16 mdef = " + stream.ReadInt16());/* 34 */
-			str.AppendLine("	Int16 accuracy_right = " + stream.ReadInt16());/* 36 */
-			str.AppendLine("	Int16 accuracy_left = " + stream.ReadInt16()); /* 38 */
-			str.AppendLine("	Int16 m_accuracy = " + stream.ReadInt16()); /* 40 */
-			str.AppendLine("	Int16 evasion = " + stream.ReadInt16()); /* 42 */
-			str.AppendLine("	Int16 m_res = " + stream.ReadInt16()); /* 44 */
-			str.AppendLine("	Int16 block_per = " + stream.ReadInt16()); /* 46 */
-			str.AppendLine("	Int16 mov_spd = " + stream.ReadInt16()); /* 48 */
-			str.AppendLine("	Int16 atk_spd = " + stream.ReadInt16()); /* 50 */
-			str.AppendLine("	Int16 unknown2 = " + stream.ReadInt16());
-			str.AppendLine("	Int16 max_weight = " + stream.ReadInt16()); /* 54 */
-			str.AppendLine("	Int16 unknown4 = " + stream.ReadInt16());
-			str.AppendLine("	Int16 cast_spd = " + stream.ReadInt16());  /* 58 */
-			str.AppendLine("	Int16 recast_spd = " + stream.ReadInt16());  /* 60 */
-			str.AppendLine("	Int16 unknown5 = " + stream.ReadInt16());
-			str.AppendLine("	Int16 hp_regen = " + stream.ReadInt16()); /* 64 */
-			str.AppendLine("	Int16 hp_recov = " + stream.ReadInt16()); /* 66 */
-			str.AppendLine("	Int16 mp_regen = " + stream.ReadInt16()); /* 68 */
-			str.AppendLine("	Int16 mp_recov = " + stream.ReadInt16()); /* 70 */
-			str.AppendLine("	Int16 perf_block = " + stream.ReadInt16()); /* 72 */
-			str.AppendLine("	Int16 m_ignore = " + stream.ReadInt16()); /* 74 */
-			str.AppendLine("	Int16 m_ignore_perc = " + stream.ReadInt16()); /* 76 */
-			str.AppendLine("	Int16 p_ignore = " + stream.ReadInt16()); /* 78 */
-			str.AppendLine("	Int16 p_ignore_perc = " + stream.ReadInt16()); /* 80 */
-			str.AppendLine("	Int16 m_pierce = " + stream.ReadInt16()); /* 82 */
-			str.AppendLine("	Int16 m_pierce_perc = " + stream.ReadInt16()); /* 84 */
-			str.AppendLine("	Int16 p_pierce = " + stream.ReadInt16()); /* 86 */
-			str.AppendLine("	Int16 p_pierce_perc = " + stream.ReadInt16()); /* 88 */
-			str.AppendLine("	Byte is_temporary = " + stream.ReadByte()); /* 90 */
-			str.AppendLine("}");
+			str.AppendLine("	uint handle = " + stream.ReadUInt32()); /* 0 */
+            str.AppendLine("    CreatureStat stat = {");
+            str.AppendLine("        short stat_id = " + stream.ReadInt16());
+            str.AppendLine("        short strength = " + stream.ReadInt16());
+            str.AppendLine("        short vital = " + stream.ReadInt16());
+            str.AppendLine("        short dexterity = " + stream.ReadInt16());
+            str.AppendLine("        short agility = " + stream.ReadInt16());
+            str.AppendLine("        short intelligence = " + stream.ReadInt16());
+            str.AppendLine("        short mentality = " + stream.ReadInt16());
+            str.AppendLine("        short luck = " + stream.ReadInt16());
+            str.AppendLine("    }");
+            str.AppendLine("    CreatureAttribute attribute = {");
+            str.AppendLine("        short nCritical = " + stream.ReadInt16());
+            str.AppendLine("        short nCriticalPower = " + stream.ReadInt16());
+            str.AppendLine("        short nAttackPointRight = " + stream.ReadInt16());
+            str.AppendLine("        short nAttackPointLeft = " + stream.ReadInt16());
+            str.AppendLine("        short nDefence = " + stream.ReadInt16());
+            str.AppendLine("        short nBlockDefence = " + stream.ReadInt16());
+            str.AppendLine("        short nMagicPoint = " + stream.ReadInt16());
+            str.AppendLine("        short nMagicDefence = " + stream.ReadInt16());
+            str.AppendLine("        short nAccuracyRight = " + stream.ReadInt16());
+            str.AppendLine("        short nAccuracyLeft = " + stream.ReadInt16());
+            str.AppendLine("        short nMagicAccuracy = " + stream.ReadInt16());
+            str.AppendLine("        short nAvoid = " + stream.ReadInt16());
+            str.AppendLine("        short nMagicAvoid = " + stream.ReadInt16());
+            str.AppendLine("        short nBlockChance = " + stream.ReadInt16());
+            str.AppendLine("        short nMoveSpeed = " + stream.ReadInt16());
+            str.AppendLine("        short nAttackSpeed = " + stream.ReadInt16());
+            str.AppendLine("        short nAttackRange = " + stream.ReadInt16());
+            str.AppendLine("        short nMaxWeight = " + stream.ReadInt16());
+            str.AppendLine("        short nCastingSpeed = " + stream.ReadInt16());
+            str.AppendLine("        short nCoolTimeSpeed = " + stream.ReadInt16());
+            str.AppendLine("        short nItemChance = " + stream.ReadInt16());
+            str.AppendLine("        short nHPRegenPercentage = " + stream.ReadInt16());
+            str.AppendLine("        short nHPRegenPoint = " + stream.ReadInt16());
+            str.AppendLine("        short nMPRegenPercentage = " + stream.ReadInt16());
+            str.AppendLine("        short nMPRegenPoint = " + stream.ReadInt16());
+            str.AppendLine("    }");
+            str.AppendLine("    byte type = " + stream.ReadByte());
+            str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_STAT_INFO", stream, str.ToString());
 		}
 
-		internal static void send_CharList(ref PacketStream stream)
+		internal static void TS_SC_CHARACTER_LIST(ref PacketStream pStream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
-			stream.ReadByte();
+			str.AppendLine("struct TS_SC_CHARACTER_LIST [" + pStream.GetId() + "]");
+			pStream.ReadByte();
 
-			str.AppendLine("{");
-			str.AppendLine("	Int16 unknown = " + stream.ReadInt16());
-			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
-			short count = stream.ReadInt16();
-			str.AppendLine("	Int16 char_count = " + count);	/* 6 */
-			str.AppendLine("	struct character[char_count]");
-			str.AppendLine("	{");
+			// Extends: 
+			str.Append("{\r\n");
+			str.Append("	uint current_server_time = ").Append(pStream.ReadUInt32()).Append("\r\n");
+			str.Append("	ushort last_login_index = ").Append(pStream.ReadUInt16()).Append("\r\n");
+			int count = pStream.ReadUInt16();
+			str.Append("	ushort count = ").Append(count).Append("\r\n");
+			str.Append("	struct LOBBY_CHARACTER_INFO[] char_list[count] = {\r\n");
 			for (int i = 0; i < count; i++)
 			{
-				str.AppendLine("		{");
-				str.AppendLine("			Int32 sex = " + stream.ReadInt32());				/* 8 */
-				str.AppendLine("			Int32 race = " + stream.ReadInt32());				/* 12 */
-				str.AppendLine("			Int32 model00 = " + stream.ReadInt32());			/* 16 */
-				str.AppendLine("			Int32 model01 = " + stream.ReadInt32());			/* 20 */
-				str.AppendLine("			Int32 model02 = " + stream.ReadInt32());			/* 24 */
-				str.AppendLine("			Int32 model03 = " + stream.ReadInt32());			/* 28 */
-				str.AppendLine("			Int32 model04 = " + stream.ReadInt32());			/* 32 */
-				str.AppendLine("			Int32 hair_color = " + stream.ReadInt32());		/* 36 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 40 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 44 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());		/* 48 */
-				str.AppendLine("			Int32 right_hand = " + stream.ReadInt32());		/* 52 */
-				str.AppendLine("			Int32 left_hand = " + stream.ReadInt32());		/* 54 */
-				str.AppendLine("			Int32 armor_id = " + stream.ReadInt32());			/* 58 */
-				str.AppendLine("			Int32 cap_id = " + stream.ReadInt32());			/* 62 */
-				str.AppendLine("			Int32 hand_id = " + stream.ReadInt32()); 			/* 66 */
-				str.AppendLine("			Int32 feet_id = " + stream.ReadInt32());			/* 70 */
-				str.AppendLine("			Int32 belt_id = " + stream.ReadInt32());			/* 74 */
-				str.AppendLine("			Int32 cape_id = " + stream.ReadInt32());			/* 78 */
-				str.AppendLine("			Int32 necklace_id = " + stream.ReadInt32());		/* 82 */
-				str.AppendLine("			Int32 ring1 = " + stream.ReadInt32());			/* 86 */
-				str.AppendLine("			Int32 ring2 = " + stream.ReadInt32());			/* 90 */
-				str.AppendLine("			Int32 earring = " + stream.ReadInt32());			/* 94 */
-				str.AppendLine("			Int32 mask_id = " + stream.ReadInt32());			/* 98 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 102 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());			/* 106 */
-				str.AppendLine("			Int32 deco_shield_id = " + stream.ReadInt32());	/* 110 */
-				str.AppendLine("			Int32 deco_costume_id = " + stream.ReadInt32());	/* 114 */
-				str.AppendLine("			Int32 deco_head_id = " + stream.ReadInt32());		/* 118 */
-				str.AppendLine("			Int32 deco_gloves_id = " + stream.ReadInt32());	/* 122 */
-				str.AppendLine("			Int32 deco_shoes_id = " + stream.ReadInt32());	/* 126 */
-				str.AppendLine("			Int32 deco_cloak_id = " + stream.ReadInt32());	/* 130 */
-				str.AppendLine("			Int32 deco_bag_id = " + stream.ReadInt32());		/* 134 */
-				str.AppendLine("			Int32 mount_id = " + stream.ReadInt32());			/* 138 */
-				str.AppendLine("			Int32 bag_id = " + stream.ReadInt32());			/* 142 */
-				str.AppendLine("			Int32 level = " + stream.ReadInt32());			/* 146 */
-				str.AppendLine("			Int32 job = " + stream.ReadInt32());				/* 150 */
-				str.AppendLine("			Int32 job_level = " + stream.ReadInt32());		/* 154 */
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-				str.AppendLine("			Byte unknown = " + stream.ReadByte());
-				str.AppendLine("			String(19) char_name = " + stream.ReadString(0, 19));	/* 175 */
-				str.AppendLine("			Int32 skin_color = " + stream.ReadInt32());		/* 194 */
-				str.AppendLine("			String(30) create_date = " + stream.ReadString(0, 30));	/* 198 */
-				str.AppendLine("			String(30) delete_date = " + stream.ReadString(0, 30));
-				for (int j = 0; j < 312; j += 4)
-					str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
-				str.AppendLine("		}");
+				str.Append("	struct MODEL_INFO model_info = {\r\n");
+				str.Append("		int sex = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("		int race = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("		int model_id[5] = {\r\n         ");
+				for (int j = 0; j < 5; j++)
+					str.Append(pStream.ReadInt32()).Append(",");
+				str.Append("\r\n		}\r\n");
+				str.Append("		int texture_id = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("		int wear_info[24] = {\r\n           ");
+				for (int j = 0; j < 24; j++)
+					str.Append(pStream.ReadInt32()).Append(",");
+				str.Append("\r\n		}\r\n");
+				str.Append("	}\r\n");
+				str.Append("	int level = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int job = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int job_level = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int exp_percentage = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int hp = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int mp = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	int permission = ").Append(pStream.ReadInt32()).Append("\r\n");
+				str.Append("	bool is_banned = ").Append(pStream.ReadBool()).Append("\r\n");
+				str.Append("	char name[19] = ").Append(pStream.ReadString(0, 19)).Append("\r\n");
+				str.Append("	uint skin_color = ").Append(pStream.ReadUInt32()).Append("\r\n");
+				str.Append("	char szCreateTime[30] = ").Append(pStream.ReadString(0, 30)).Append("\r\n");
+				str.Append("	char szDeleteTime[30] = ").Append(pStream.ReadString(0, 30)).Append("\r\n");
+				str.Append("	int wear_item_enhance_info[24] = {\r\n      ");
+				for (int j = 0; j < 24; j++)
+					str.Append(pStream.ReadInt32()).Append(",");
+				str.Append("\r\n	}\r\n");
+				str.Append("	int wear_item_level_info[24] = {\r\n        ");
+				for (int j = 0; j < 24; j++)
+					str.Append(pStream.ReadInt32()).Append(",");
+				str.Append("\r\n	}\r\n");
+				str.Append("	char wear_item_elemental_type[24] = {\r\n       ");
+				for (int j = 0; j < 24; j++)
+					str.Append(pStream.ReadByte()).Append(",");
+				str.Append("\r\n	}\r\n");
 			}
-			str.AppendLine("	}");
-			str.AppendLine("}");
+			str.Append("}\r\n");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_CHARACTER_LIST", pStream, str.ToString());
 		}
 
 		internal static void send_Dialog(ref PacketStream stream)
@@ -827,19 +844,19 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 }
 
-		internal static void send_UrlList(ref PacketStream stream)
+		internal static void TS_SC_URL_LIST(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_URL_LIST [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			short size = stream.ReadInt16();
-			str.AppendLine("	Int16 string_length = " + size);
-			str.AppendLine("	String(string_length) url_list = " + stream.ReadString(0, size));
+			ushort size = stream.ReadUInt16();
+			str.AppendLine("	ushort url_list_len = " + size);
+			str.AppendLine("    char url_list[url_list_len] = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_URL_LIST", stream, str.ToString());
 		}
 
 		internal static void send_MaxHPMPUpdate(ref PacketStream stream)
@@ -862,18 +879,18 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void send_EntityState(ref PacketStream stream)
+		internal static void TS_SC_STATUS_CHANGE(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_STATUS_CHANGE [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32()); /* 0 */
-			str.AppendLine("	UInt32 state = " + stream.ReadUInt32()); /* 4 */
+			str.AppendLine("	uint handle = " + stream.ReadUInt32());
+			str.AppendLine("	uint status = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_STATUS_CHANGE", stream, str.ToString());
 		}
 
 		internal static void send_SkillList(ref PacketStream stream)
@@ -905,20 +922,20 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void packet2(ref PacketStream stream)
+		internal static void TS_TIMESYNC(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_TIMESYNC [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			//str.AppendLine("	2B unknown = " + unk1);
+			str.AppendLine("	uint time = " + stream.ReadUInt32());
 			str.AppendLine("}");
 
 			if (Src == 'S')
-				Form1.PacketRecv('G', "PacketName", stream);
+				Form1.PacketRecv('G', "TS_TIMESYNC", stream, str.ToString());
 			else
-				Form1.PacketSend('G', "PacketName", stream);
+				Form1.PacketSend('G', "TS_TIMESYNC", stream, str.ToString());
 		}
 
 		internal static void parse_ClientVersion(ref PacketStream stream)
@@ -1011,39 +1028,39 @@ namespace RappelzSniffer.Network
 			Form1.PacketSend('G', "PacketName", stream);
 		}
 
-		internal static void send_LoginResult(ref PacketStream stream)
+		internal static void TS_LOGIN_RESULT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_LOGIN_RESULT [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int16 result = " + stream.ReadInt16());
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
+			str.AppendLine("	bool bIsAccepted = " + stream.ReadBool());
+			str.AppendLine("	uint handle = " + stream.ReadUInt32());
 			str.AppendLine("	float x = " + stream.ReadFloat());
 			str.AppendLine("	float y = " + stream.ReadFloat());
 			str.AppendLine("	float z = " + stream.ReadFloat());
-			str.AppendLine("	Byte layer = " + stream.ReadByte());
-			str.AppendLine("	float face = " + stream.ReadFloat());
-			str.AppendLine("	Int32 region_size = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hp = " + stream.ReadInt32());
-			str.AppendLine("	Int32 mp = " + stream.ReadInt32());
-			str.AppendLine("	Int32 max_hp = " + stream.ReadInt32());
-			str.AppendLine("	Int32 max_mp = " + stream.ReadInt32());
-			str.AppendLine("	Int32 havoc = " + stream.ReadInt32());
-			str.AppendLine("	Int32 max_havoc = " + stream.ReadInt32());
-			str.AppendLine("	Int32 sex = " + stream.ReadInt32());
-			str.AppendLine("	Int32 race = " + stream.ReadInt32());
-			str.AppendLine("	Int32 skin_color = " + stream.ReadInt32());
-			str.AppendLine("	Int32 face_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hair_id = " + stream.ReadInt32());
-			str.AppendLine("	string(19) char_name = " + stream.ReadString(0, 19));
-			str.AppendLine("	Int32 cell_size = " + stream.ReadInt32());
-			str.AppendLine("	Int32 guild_id = " + stream.ReadInt32());
+			str.AppendLine("	byte layer = " + stream.ReadByte());
+			str.AppendLine("	float face_direction = " + stream.ReadFloat());
+			str.AppendLine("	int region_size = " + stream.ReadInt32());
+			str.AppendLine("	int hp = " + stream.ReadInt32());
+			str.AppendLine("	short mp = " + stream.ReadInt16());
+			str.AppendLine("	int max_hp = " + stream.ReadInt32());
+			str.AppendLine("	short max_mp = " + stream.ReadInt16());
+			str.AppendLine("	int havoc = " + stream.ReadInt32());
+			str.AppendLine("	int max_havoc = " + stream.ReadInt32());
+			str.AppendLine("	int sex = " + stream.ReadInt32());
+			str.AppendLine("	int race = " + stream.ReadInt32());
+			str.AppendLine("	uint skin_color = " + stream.ReadInt32());
+			str.AppendLine("	int face_id = " + stream.ReadInt32());
+			str.AppendLine("	int hair_id = " + stream.ReadInt32());
+			str.AppendLine("	char name[19] = " + stream.ReadString(0, 19));
+			str.AppendLine("	int cell_size = " + stream.ReadInt32());
+			str.AppendLine("	int guild_id = " + stream.ReadInt32());
 
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_LOGIN_RESULT", stream, str.ToString());
 		}
 
 		internal static void send_A(ref PacketStream stream)
@@ -1060,20 +1077,21 @@ namespace RappelzSniffer.Network
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void parse_Scripts(ref PacketStream stream)
+		internal static void TS_SC_CHAT(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_CHAT [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	String(21) msg_type = " + stream.ReadString(0, 21));
-			short size = stream.ReadInt16();
-			str.AppendLine("	Int16 size = " + size);
-			str.AppendLine("	String(size) = " + stream.ReadString(0, size));
+			str.AppendLine("	char sender[21] = " + stream.ReadString(0, 21));
+			ushort size = stream.ReadUInt16();
+			str.AppendLine("	ushort size = " + size);
+			str.AppendLine("	byte type = " + stream.ReadByte());
+            str.AppendLine("    char msg[size] = " + stream.ReadString(0, size));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_CHAT", stream, str.ToString());
 		}
 
 		internal static void send_37(ref PacketStream stream)
@@ -1090,99 +1108,116 @@ namespace RappelzSniffer.Network
 		
 		}
 
-		internal static void send_CharView(ref PacketStream stream)
+		internal static void TS_WEAR_INFO(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_WEAR_INFO [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int32 player_handle = " + stream.ReadInt32());
-			str.AppendLine("	Int32 weapon_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 shield_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 armor_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 cap_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 hand_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 feet_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 belt_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 cape_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 necklace_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 ring1 = " + stream.ReadInt32());
-			str.AppendLine("	Int32 ring2 = " + stream.ReadInt32());
-			str.AppendLine("	Int32 earring = " + stream.ReadInt32());
-			str.AppendLine("	Int32 mask_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("	Int32 unknown = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_shield_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_costume_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_head_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_gloves_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_shoes_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_cloak_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 deco_bag_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 mount_id = " + stream.ReadInt32());
-			str.AppendLine("	Int32 bag_id = " + stream.ReadInt32());
-			for (int i = 0; i < 312; i += 4)
-			{
-				str.Append("	4B Unknown = " + stream.ReadInt32());
-			}
-			str.AppendLine("}");
+			str.AppendLine("	uint handle = " + stream.ReadInt32());
+            str.AppendLine("	int itemCode[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.AppendLine("\r\n        ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("\r\n    }");
+            str.AppendLine("	int itemEnhance[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.AppendLine("\r\n        ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("\r\n    }");
+            str.AppendLine("	int itemLevel[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.AppendLine("\r\n        ");
+                str.Append(stream.ReadInt32() + " ");
+            }
+            str.AppendLine("\r\n    }");
+            str.AppendLine("	byte elemental_effect_type[24] = {");
+            for (int i = 0; i < 24; i++)
+            {
+                if (i % 8 == 0)
+                    str.AppendLine("        ");
+                str.Append(stream.ReadByte() + " ");
+            }
+            str.AppendLine("\r\n    }");
+            str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_WEAR_INFO", stream, str.ToString());
 		}
 
-		internal static void send_InventoryList(ref PacketStream stream)
+		internal static void TS_SC_INVENTORY(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_INVENTORY [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
 			short count = stream.ReadInt16();
-			str.AppendLine("	Int16 count = " + count);
-			str.AppendLine("	struct Item[count]");
+			str.AppendLine("    ushort count = " + count);
+			str.AppendLine("	TS_ITEM_INFO items[count]");
 			str.AppendLine("	{");
 			for (int i = 0; i < count; i++)
 			{
 				str.AppendLine("		{");
-				str.AppendLine("			UInt32 item_handle = " + stream.ReadUInt32());
-				str.AppendLine("			Int32 item_id = " + stream.ReadInt32());
-				str.AppendLine("			Int64 item_uid = " + stream.ReadInt64());
-				str.AppendLine("			Int64 count = " + stream.ReadInt64());
-				str.AppendLine("			4B unknown = " + stream.ReadInt32());
-				str.AppendLine("			4B unknown = " + stream.ReadInt32());
-				str.AppendLine("			Byte enhance = " + stream.ReadByte());
-				str.AppendLine("			Byte level = " + stream.ReadByte());
-				str.AppendLine("			1B unknown = " + stream.ReadByte());
-				for (int j = 0; j < 80; j+=4)
-					str.AppendLine("			4B unknown = " + stream.ReadInt32());
-				str.AppendLine("			Int32 wear_info = " + stream.ReadInt32());
-				str.AppendLine("			Int16 unknown // 0 = " + stream.ReadInt16());
-				str.AppendLine("			Int32 idx = " + stream.ReadInt32());
+                str.AppendLine("            TS_ITEM_BASE_INFO base =");
+                str.AppendLine("            {");
+				str.AppendLine("			    uint handle = " + stream.ReadUInt32());
+				str.AppendLine("			    int code = " + stream.ReadInt32());
+				str.AppendLine("			    long uid = " + stream.ReadInt64());
+				str.AppendLine("			    long count = " + stream.ReadInt64());
+				str.AppendLine("			    int ethereal_durability = " + stream.ReadInt32());
+				str.AppendLine("		        uint endurance = " + stream.ReadUInt32());
+				str.AppendLine("			    byte enhance = " + stream.ReadByte());
+				str.AppendLine("			    byte level = " + stream.ReadByte());
+				str.AppendLine("			    int flag = " + stream.ReadInt32());
+                str.AppendLine("                int socket[4] = {");
+                str.Append("                    ");
+                for (int j = 0; j < 4; j++)
+					 str.Append(stream.ReadInt32() + "; ");
+                str.AppendLine("}");
+                str.AppendLine("			    int remain_time = " + stream.ReadInt32());
+                str.AppendLine("			    byte elemental_effect_type; = " + stream.ReadByte());
+                str.AppendLine("			    int elemental_effect_remain_time = " + stream.ReadInt32());
+                str.AppendLine("			    int elemental_effect_attack_point = " + stream.ReadInt32());
+                str.AppendLine("			    int elemental_effect_magic_point = " + stream.ReadInt32());
+                str.AppendLine("            }");
+                str.AppendLine("			short wear_position = " + stream.ReadInt16());
+				str.AppendLine("			uint own_summon_handle = " + stream.ReadUInt32());
+				str.AppendLine("			int idx = " + stream.ReadInt32());
 				str.AppendLine("		}");
 			}
-
+            str.AppendLine("    }");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_INVENTORY", stream, str.ToString());
 		}
 
-		internal static void send_BeltSlotInfo(ref PacketStream stream)
+		internal static void TS_SC_BELT_SLOT_INFO(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_BELT_SLOT_INFO [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	UInt32 slot0_handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 slot1_handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 slot2_handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 slot3_handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 slot4_handle = " + stream.ReadUInt32());
-			str.AppendLine("	UInt32 slot5_handle = " + stream.ReadUInt32());
+            str.AppendLine("    uint handle[6] = {");
+            str.Append("        ");
+            for (int i = 0; i < 6; i++)
+            {
+                str.Append(stream.ReadInt32() + ", ");
+            }
+            str.AppendLine("");
+            str.AppendLine("    };");
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_BELT_SLOT_INFO", stream, str.ToString());
 		
 		}
 
@@ -1201,39 +1236,49 @@ namespace RappelzSniffer.Network
 		
 		}
 
-		internal static void send_QuestList(ref PacketStream stream)
+		internal static void TS_SC_QUEST_LIST(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_QUEST_LIST [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			int count = stream.ReadInt32();
-			str.AppendLine("	Int32 count = " + count);
-			str.AppendLine("	struct Quest[count]");
+			ushort count_active = stream.ReadUInt16();
+            ushort count_pending = stream.ReadUInt16();
+            str.AppendLine("	ushort count_active = " + count_active);
+            str.AppendLine("    ushort count_pending = " + count_pending);
+			str.AppendLine("	TS_QUEST_INFO actives[count_active]");
 			str.AppendLine("	{");
-			for (int j = 0; j < count; j++)
+			for (int j = 0; j < count_active; j++)
 			{
 				str.AppendLine("		{");
-				str.AppendLine("			Int32 quest_id = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status1 = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status2 = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status3 = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status4 = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status5 = " + stream.ReadInt32());
-				str.AppendLine("			Int32 status6 = " + stream.ReadInt32());
-				str.Append("			23B unknown = ");
-				for (int i = 0; i < 23; i++)
-					str.Append(stream.ReadByte() + " ");
-				str.Append("\r\n");
-				str.AppendLine("			Byte progress = " + stream.ReadByte());
-				str.AppendLine("			Int32 unknown = " + stream.ReadInt32());
+				str.AppendLine("		    int code = " + stream.ReadInt32());
+				str.AppendLine("			int nStartID = " + stream.ReadInt32());
+                str.AppendLine("            int nRandomValue[6] = {");
+                str.Append("                ");
+                for (int i = 0; i < 6; i++)
+                {
+                    str.Append(stream.ReadInt32() + " ");
+                }
+                str.Append("\r\n            }");
+				str.AppendLine("			byte nProgress = " + stream.ReadByte());
+				str.AppendLine("			uint nTimeLimit = " + stream.ReadUInt32());
 				str.AppendLine("		}");
 			}
 			str.AppendLine("	}");
-			str.AppendLine("}");
+            str.AppendLine("	TS_PENDING_QUEST_INFO pendings[count_pending]");
+            str.AppendLine("	{");
+            for (int j = 0; j < count_pending; j++)
+            {
+                str.AppendLine("		{");
+                str.AppendLine("		    int code = " + stream.ReadInt32());
+                str.AppendLine("			int nStartID = " + stream.ReadInt32());
+                str.AppendLine("		}");
+            }
+            str.AppendLine("	}");
+            str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_QUEST_LIST", stream, str.ToString());
 		}
 
 		internal static void send_QuestUpdate(ref PacketStream stream)
@@ -1258,107 +1303,109 @@ namespace RappelzSniffer.Network
 		
 		}
 
-		internal static void send_LocationInfo(ref PacketStream stream)
+		internal static void TS_SC_CHANGE_LOCATION(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_CHANGE_LOCATION [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int32 old_location = " + stream.ReadInt32());
-			str.AppendLine("	Int32 new_location = " + stream.ReadInt32());
+			str.AppendLine("	int prev_location_id = " + stream.ReadInt32());
+			str.AppendLine("	int cur_location_id = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', "TS_SC_CHANGE_LOCATION", stream, str.ToString());
+		}
+
+		internal static void TS_SC_WEATHER_INFO(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct TS_SC_WEATHER_INFO [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("    uint region_id = " + stream.ReadUInt32());
+			str.AppendLine("	ushort weather_id = " + stream.ReadUInt16());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', "TS_SC_WEATHER_INFO", stream, str.ToString());
+		}
+
+		internal static void TS_SC_GOLD_UPDATE(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct TS_SC_GOLD_UPDATE [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	long gold = " + stream.ReadInt64());
+			str.AppendLine("	int chaos = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', "TS_SC_GOLD_UPDATE", stream, str.ToString());
+		}
+
+		internal static void TS_SC_LEVEL_UPDATE(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct TS_SC_LEVEL_UPDATE [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	uint handle = " + stream.ReadUInt32());
+			str.AppendLine("	int level = " + stream.ReadInt32());
+			str.AppendLine("	int job_level = " + stream.ReadInt32());
+			str.AppendLine("}");
+
+			Form1.PacketRecv('G', "TS_SC_LEVEL_UPDATE", stream, str.ToString());
+		}
+
+		internal static void TS_SC_EXP_UPDATE(ref PacketStream stream)
+		{
+			StringBuilder str = new StringBuilder();
+			str.AppendLine("struct TS_SC_EXP_UPDATE [" + stream.GetId() + "]");
+			stream.ReadByte();
+
+			str.AppendLine("{");
+			str.AppendLine("	uint handle = " + stream.ReadUInt32());
+			str.AppendLine("	long char_exp = " + stream.ReadInt64());
+			str.AppendLine("	int jp = " + stream.ReadInt32());
 			str.AppendLine("}");
 
 			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
 		}
 
-		internal static void send_WeatherInfo(ref PacketStream stream)
+		internal static void TS_SC_GAME_TIME(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_GAME_TIME [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int32 local_id = " + stream.ReadInt32());
-			str.AppendLine("	Int16 Weather = " + stream.ReadInt16());
+			str.AppendLine("	int t = " + stream.ReadInt32());
+			str.AppendLine("	int game_time = " + stream.ReadInt32());
+            str.AppendLine("    4B unknown = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_GAME_TIME", stream, str.ToString());
 		}
 
-		internal static void send_UpdateGoldChaos(ref PacketStream stream)
+		internal static void TS_SC_OPEN_URL(ref PacketStream stream)
 		{
 			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
+			str.AppendLine("struct TS_SC_OPEN_URL [" + stream.GetId() + "]");
 			stream.ReadByte();
 
 			str.AppendLine("{");
-			str.AppendLine("	Int64 gold = " + stream.ReadInt64());
-			str.AppendLine("	Int32 chaos = " + stream.ReadInt32());
+            str.AppendLine("    bool wait_for_event_scene = " + stream.ReadBool());
+            str.AppendLine("    int width = " + stream.ReadInt32());
+            str.AppendLine("    int height = " + stream.ReadInt32());
+            ushort len = stream.ReadUInt16();
+            str.AppendLine("    ushort url_len = " + len);
+			str.AppendLine("	char url[len] = " + stream.ReadString(0, len));
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
-		}
-
-		internal static void send_UpdateLevel(ref PacketStream stream)
-		{
-			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
-			stream.ReadByte();
-
-			str.AppendLine("{");
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
-			str.AppendLine("	Int32 level = " + stream.ReadInt32());
-			str.AppendLine("	Int32 job_level = " + stream.ReadInt32());
-			str.AppendLine("}");
-
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
-		}
-
-		internal static void send_UpdateExp(ref PacketStream stream)
-		{
-			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
-			stream.ReadByte();
-
-			str.AppendLine("{");
-			str.AppendLine("	UInt32 handle = " + stream.ReadUInt32());
-			str.AppendLine("	Int64 char_exp = " + stream.ReadInt64());
-			str.AppendLine("	Int64 jp = " + stream.ReadInt64());
-			str.AppendLine("}");
-
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
-		}
-
-		internal static void send_GameTime(ref PacketStream stream)
-		{
-			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
-			stream.ReadByte();
-
-			str.AppendLine("{");
-			str.AppendLine("	Int32 start_time = " + stream.ReadInt32());
-			str.AppendLine("	Int64 unix_timestamp = " + stream.ReadInt64());
-			str.AppendLine("}");
-
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
-		}
-
-		internal static void send_OpenPopup(ref PacketStream stream)
-		{
-			StringBuilder str = new StringBuilder();
-			str.AppendLine("struct " + "PacketName" + " [" + stream.GetId() + "]");
-			stream.ReadByte();
-
-			str.AppendLine("{");
-			str.Append("	11B unknown = ");
-			for (int i = 0; i < 11; i++)
-				str.Append(stream.ReadByte() + " ");
-			str.Append("\r\n");
-			str.AppendLine("	String url = " + stream.ReadString(0, stream.GetSize() - 18));
-			str.AppendLine("}");
-
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_OPEN_URL", stream, str.ToString());
 		}
 
 		internal static void send_Unamed191(ref PacketStream stream)
