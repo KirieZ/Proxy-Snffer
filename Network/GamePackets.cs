@@ -52,7 +52,7 @@ namespace RappelzSniffer.Network
             str.AppendLine("    byte race = " + stream.ReadByte());
 			str.AppendLine("}");
 
-			Form1.PacketSend('G', "PacketName", stream, str.ToString());
+			Form1.PacketSend('G', "TS_LOGIN", stream, str.ToString());
 		}
 
 		internal static void parse_PCMoveReq(ref PacketStream stream)
@@ -1372,7 +1372,7 @@ namespace RappelzSniffer.Network
 			str.AppendLine("	int jp = " + stream.ReadInt32());
 			str.AppendLine("}");
 
-			Form1.PacketRecv('G', "PacketName", stream, str.ToString());
+			Form1.PacketRecv('G', "TS_SC_EXP_UPDATE", stream, str.ToString());
 		}
 
 		internal static void TS_SC_GAME_TIME(ref PacketStream stream)
