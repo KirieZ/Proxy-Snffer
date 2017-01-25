@@ -10,7 +10,7 @@ namespace RappelzSniffer.Network
 {
 	public static class GamePackets
 	{
-		private static Dictionary<short, Packets.Packet> packet_db;
+		public static Dictionary<short, Packets.Packet> packet_db;
 		private static char Src = ' ';
 
 		static GamePackets()

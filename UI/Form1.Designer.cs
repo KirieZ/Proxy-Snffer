@@ -30,16 +30,12 @@
 		{
             this.components = new System.ComponentModel.Container();
             this.packets = new System.Windows.Forms.DataGridView();
-            this.direct = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.len = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.data = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.str = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button1 = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.TskbarLogging = new System.Windows.Forms.NotifyIcon(this.components);
+            this.combo_Filter = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.linkedBox1 = new HexEdit.LinkedBox();
             this.hexEditBox1 = new HexEdit.HexEditBox();
             ((System.ComponentModel.ISupportInitialize)(this.packets)).BeginInit();
@@ -51,62 +47,15 @@
             this.packets.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.packets.BackgroundColor = System.Drawing.Color.Gray;
             this.packets.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.packets.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.direct,
-            this.id,
-            this.name,
-            this.len,
-            this.data,
-            this.str});
             this.packets.GridColor = System.Drawing.Color.White;
-            this.packets.Location = new System.Drawing.Point(0, -1);
+            this.packets.Location = new System.Drawing.Point(0, 29);
             this.packets.Name = "packets";
             this.packets.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.packets.Size = new System.Drawing.Size(619, 171);
             this.packets.TabIndex = 0;
             this.packets.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.packets_CellClick);
+            this.packets.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.packets_RowPostPaint);
             this.packets.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.packets_RowsAdded);
-            // 
-            // direct
-            // 
-            this.direct.FillWeight = 60.9137F;
-            this.direct.HeaderText = "Direction";
-            this.direct.Name = "direct";
-            this.direct.ReadOnly = true;
-            // 
-            // id
-            // 
-            this.id.FillWeight = 49.14294F;
-            this.id.HeaderText = "ID";
-            this.id.MaxInputLength = 10;
-            this.id.Name = "id";
-            this.id.ReadOnly = true;
-            // 
-            // name
-            // 
-            this.name.FillWeight = 144.9717F;
-            this.name.HeaderText = "Name";
-            this.name.Name = "name";
-            this.name.ReadOnly = true;
-            // 
-            // len
-            // 
-            this.len.FillWeight = 144.9717F;
-            this.len.HeaderText = "Length";
-            this.len.Name = "len";
-            this.len.ReadOnly = true;
-            // 
-            // data
-            // 
-            this.data.HeaderText = "Raw Data";
-            this.data.Name = "data";
-            this.data.Visible = false;
-            // 
-            // str
-            // 
-            this.str.HeaderText = "Struct";
-            this.str.Name = "str";
-            this.str.Visible = false;
             // 
             // button1
             // 
@@ -120,9 +69,9 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(0, 176);
+            this.richTextBox1.Location = new System.Drawing.Point(0, 206);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(619, 227);
+            this.richTextBox1.Size = new System.Drawing.Size(619, 197);
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             // 
@@ -140,6 +89,42 @@
             // 
             this.TskbarLogging.Text = "PacketInspector";
             this.TskbarLogging.Visible = true;
+            // 
+            // combo_Filter
+            // 
+            this.combo_Filter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.combo_Filter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.combo_Filter.FormattingEnabled = true;
+            this.combo_Filter.Items.AddRange(new object[] {
+            "None",
+            "TS_SC_RESULT",
+            "TS_CA_RSA_PUBLIC_KEY",
+            "TS_AC_AES_KEY_IV",
+            "TS_DUMMY",
+            "TS_AC_RESULT",
+            "TS_CA_VERSION",
+            "TS_AC_RESULT_WITH_STRING",
+            "TS_CA_OTP_ACCOUNT",
+            "TS_CA_IMBC_ACCOUNT",
+            "TS_CA_SERVER_LIST",
+            "TS_AC_SERVER_LIST",
+            "TS_CA_SELECT_SERVER",
+            "TS_AC_SELECT_SERVER",
+            "TS_CA_DISTRIBUTION_INFO"});
+            this.combo_Filter.Location = new System.Drawing.Point(87, 2);
+            this.combo_Filter.Name = "combo_Filter";
+            this.combo_Filter.Size = new System.Drawing.Size(255, 21);
+            this.combo_Filter.TabIndex = 8;
+            this.combo_Filter.SelectedIndexChanged += new System.EventHandler(this.combo_Filter_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(49, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(32, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Filter:";
             // 
             // linkedBox1
             // 
@@ -162,6 +147,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 566);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.combo_Filter);
             this.Controls.Add(this.linkedBox1);
             this.Controls.Add(this.hexEditBox1);
             this.Controls.Add(this.button2);
@@ -176,24 +163,21 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.packets)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
 		#endregion
 
 		private System.Windows.Forms.DataGridView packets;
-		private System.Windows.Forms.DataGridViewTextBoxColumn direct;
-		private System.Windows.Forms.DataGridViewTextBoxColumn id;
-		private System.Windows.Forms.DataGridViewTextBoxColumn name;
-		private System.Windows.Forms.DataGridViewTextBoxColumn len;
 		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.DataGridViewTextBoxColumn data;
-		private System.Windows.Forms.DataGridViewTextBoxColumn str;
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.Button button2;
         private System.Windows.Forms.NotifyIcon TskbarLogging;
         private HexEdit.HexEditBox hexEditBox1;
         private HexEdit.LinkedBox linkedBox1;
+        private System.Windows.Forms.ComboBox combo_Filter;
+        private System.Windows.Forms.Label label1;
     }
 }
 

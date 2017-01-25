@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using RappelzSniffer.Network;
 using HexEdit;
 using System.IO;
+using static RappelzSniffer.Network.Packets;
 
 namespace RappelzSniffer
 {
@@ -18,10 +19,12 @@ namespace RappelzSniffer
 		private static Form1 Instance;
 		private static bool IsPaused = false;
         private static bool hasstarted = false;
-
+        
         private const string logFile = "packet_dump.log";
 
         private static Object _FileLocker = new object();
+
+        private DataTable packetsTable;
 
         public Form1()
 		{
@@ -31,6 +34,32 @@ namespace RappelzSniffer
 
         private void Form1_Load(object sender, EventArgs e)
 		{
+            combo_Filter.Items.Clear();
+            combo_Filter.Items.Add("None");
+            foreach(Packet p in AuthPackets.packet_db.Values)
+            {
+                combo_Filter.Items.Add(p.name);
+            }
+            foreach (Packet p in GamePackets.packet_db.Values)
+            {
+                combo_Filter.Items.Add(p.name);
+            }
+
+            packetsTable = new DataTable();
+            packetsTable.Columns.AddRange(
+                new DataColumn[]
+                {
+                    new DataColumn("Direction", typeof(string)),
+                    new DataColumn("ID", typeof(string)),
+                    new DataColumn("Name", typeof(string)),
+                    new DataColumn("Length", typeof(string)),
+                    new DataColumn("Raw Data", typeof(object)),
+                    new DataColumn("Struct", typeof(string)),
+                }
+            );
+            packets.DataSource = packetsTable;
+            packets.Columns[4].Visible = false;
+            packets.Columns[5].Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -76,15 +105,14 @@ namespace RappelzSniffer
 			if (IsPaused) return;
 			Form1.Instance.Invoke(new MethodInvoker(delegate
 			{
-				int i = Form1.Instance.packets.Rows.Add();
-				Form1.Instance.packets.Rows[i].DefaultCellStyle.BackColor = Color.LightGreen;
-				Form1.Instance.packets.Rows[i].Cells[0].Value = String.Format("({0}) recv", src);
-				Form1.Instance.packets.Rows[i].Cells[1].Value = "0x" + data.GetId().ToString("X4");
-				Form1.Instance.packets.Rows[i].Cells[2].Value = name;
-				Form1.Instance.packets.Rows[i].Cells[3].Value = data.ToArray().Length;
-				Form1.Instance.packets.Rows[i].Cells[4].Value = data;
-				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
-                Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
+                DataRow row = Form1.Instance.packetsTable.Rows.Add(
+                    String.Format("({0}) recv", src), // [0] - Direction
+                    "0x" + data.GetId().ToString("X4"), // [1] - ID
+                    name, // [2] - Name
+                    data.ToArray().Length, // [3] - Length
+                    data, // [4] Raw Data
+                    str // [5] struct
+                    );
             }));
             LogToFile("received from", src, name, data, str);
 		}
@@ -94,15 +122,14 @@ namespace RappelzSniffer
 			if (IsPaused) return;
 			Form1.Instance.Invoke(new MethodInvoker(delegate
 			{
-				int i = Form1.Instance.packets.Rows.Add();
-				Form1.Instance.packets.Rows[i].DefaultCellStyle.BackColor = Color.LightBlue;
-				Form1.Instance.packets.Rows[i].Cells[0].Value = String.Format("({0}) send", src);
-				Form1.Instance.packets.Rows[i].Cells[1].Value = "0x" + data.GetId().ToString("X4");
-				Form1.Instance.packets.Rows[i].Cells[2].Value = name;
-				Form1.Instance.packets.Rows[i].Cells[3].Value = data.ToArray().Length;
-				Form1.Instance.packets.Rows[i].Cells[4].Value = data;
-				Form1.Instance.packets.Rows[i].Cells[5].Value = str;
-                Form1.Instance.packets_CellClick(null, new DataGridViewCellEventArgs(0, i));
+                DataRow row = Form1.Instance.packetsTable.Rows.Add(
+                    String.Format("({0}) send", src), // [0] - Direction
+                    "0x" + data.GetId().ToString("X4"), // [1] - ID
+                    name, // [2] - Name
+                    data.ToArray().Length, // [3] - Length
+                    data, // [4] Raw Data
+                    str // [5] struct
+                    );
             }));
             LogToFile("sent to", src, name, data, str);
         }
@@ -183,6 +210,23 @@ namespace RappelzSniffer
         {
             if (e.RowIndex < 0) return;
             packets.CurrentCell = packets.Rows[e.RowIndex].Cells[0];
+        }
+
+        private void combo_Filter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (((string)combo_Filter.SelectedItem) != "None")
+                (packets.DataSource as DataTable).DefaultView.RowFilter = string.Format("Name = '{0}'", combo_Filter.SelectedItem);
+            else
+                (packets.DataSource as DataTable).DefaultView.RowFilter = "";
+        }
+
+        private void packets_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            DataGridViewRow row = packets.Rows[e.RowIndex];
+            if (row.Cells[0].Value.ToString().Contains("recv"))
+                row.DefaultCellStyle.BackColor = Color.LightGreen;
+            else
+                row.DefaultCellStyle.BackColor = Color.LightBlue;
         }
     }
 }
