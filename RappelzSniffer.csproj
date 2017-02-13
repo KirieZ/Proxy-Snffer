@@ -64,6 +64,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Network\AuthPackets.cs" />
+    <Compile Include="Network\GameEnums.cs" />
     <Compile Include="Network\GamePackets.cs" />
     <Compile Include="Network\Objects.cs" />
     <Compile Include="Network\Packets.cs" />

@@ -46,26 +46,33 @@ namespace RappelzSniffer.Network
 			packets_db.Add(0x0000, new Packet() { name = "TS_SC_RESULT", func = GamePackets.TS_SC_RESULT });
 			packets_db.Add(0x0001, new Packet() { name = "TS_LOGIN", func = GamePackets.TS_LOGIN });
 			packets_db.Add(0x0002, new Packet() { name = "TS_TIMESYNC", func = GamePackets.TS_TIMESYNC });
-			packets_db.Add(0x0003, new Packet() { name = "send_EntityAck", func = GamePackets.send_EntityAck });
+			packets_db.Add(0x0003, new Packet() { name = "TS_SC_ENTER", func = GamePackets.TS_SC_ENTER });
 			packets_db.Add(0x0004, new Packet() { name = "TS_LOGIN_RESULT", func = GamePackets.TS_LOGIN_RESULT });
-			packets_db.Add(0x0005, new Packet() { name = "parse_PCMoveReq", func = GamePackets.parse_PCMoveReq });
-			packets_db.Add(0x0007, new Packet() { name = "parse_PCMoveUpdt", func = GamePackets.parse_PCMoveUpdt });
-			packets_db.Add(0x0008, new Packet() { name = "send_PCMove", func = GamePackets.send_PCMove });
-			packets_db.Add(0x000A, new Packet() { name = "send_A", func = GamePackets.send_A });
-			packets_db.Add(0x000B, new Packet() { name = "send_RegionAck", func = GamePackets.send_RegionAck });
-			packets_db.Add(0x0014, new Packet() { name = "parse_Chat", func = GamePackets.parse_Chat });
-			packets_db.Add(0x0015, new Packet() { name = "send_Chat", func = GamePackets.send_Chat });
+			packets_db.Add(0x0005, new Packet() { name = "TS_CS_MOVE_REQUEST", func = GamePackets.TS_CS_MOVE_REQUEST });
+			packets_db.Add(0x0007, new Packet() { name = "TS_REGION_UPDATE", func = GamePackets.TS_REGION_UPDATE });
+			packets_db.Add(0x0008, new Packet() { name = "TS_SC_MOVE", func = GamePackets.TS_SC_MOVE });
+            packets_db.Add(0x0009, new Packet() { name = "TS_LEAVE", func = GamePackets.TS_LEAVE });
+            packets_db.Add(0x000A, new Packet() { name = "send_A", func = GamePackets.send_A });
+			packets_db.Add(0x000B, new Packet() { name = "TS_REGION_ACK", func = GamePackets.TS_REGION_ACK });
+			packets_db.Add(0x0014, new Packet() { name = "TS_CS_CHAT_REQUEST", func = GamePackets.TS_CS_CHAT_REQUEST });
+			packets_db.Add(0x0015, new Packet() { name = "TS_SC_CHAT_LOCAL", func = GamePackets.TS_SC_CHAT_LOCAL });
 			packets_db.Add(0x0016, new Packet() { name = "TS_SC_CHAT", func = GamePackets.TS_SC_CHAT });
-			packets_db.Add(0x0017, new Packet() { name = "parse_LogoutToChar", func = GamePackets.parse_LogoutToChar });
-			packets_db.Add(0x0019, new Packet() { name = "parse_LogoutToCharCheck", func = GamePackets.parse_LogoutToCharCheck });
-			packets_db.Add(0x001A, new Packet() { name = "parse_QuitGameCheck", func = GamePackets.parse_QuitGameCheck });
-			packets_db.Add(0x001B, new Packet() { name = "parse_QuitGame", func = GamePackets.parse_QuitGame });
+			packets_db.Add(0x0017, new Packet() { name = "TS_CS_RETURN_LOBBY", func = GamePackets.TS_CS_RETURN_LOBBY });
+            //packets_db.Add(0x0018, new Packet() { name = "TS_SC_CHAT_RESULT", func = GamePackets.TS_SC_CHAT_RESULT });
+            packets_db.Add(0x0019, new Packet() { name = "TS_CS_REQUEST_RETURN_LOBBY", func = GamePackets.TS_CS_REQUEST_RETURN_LOBBY });
+            packets_db.Add(0x001A, new Packet() { name = "TS_CS_REQUEST_LOGOUT", func = GamePackets.TS_CS_REQUEST_LOGOUT });
+            packets_db.Add(0x001B, new Packet() { name = "TS_CS_LOGOUT", func = GamePackets.TS_CS_LOGOUT });
 
             packets_db.Add(0x0032, new Packet() { name = "TS_CS_VERSION", func = GamePackets.TS_CS_VERSION });
 			packets_db.Add(0x0033, new Packet() { name = "parse_ClientVersion", func = GamePackets.parse_ClientVersion });
 			packets_db.Add(0x0037, new Packet() { name = "send_37", func = GamePackets.send_37 });
 
-			packets_db.Add(0x0064, new Packet() { name = "parse_PCAttack", func = GamePackets.parse_PCAttack });
+            // Epic >= 9.2
+            //packets_db.Add(0x003F, new Packet() { name = "TS_SC_ENTER", func = GamePackets.TS_SC_ENTER });
+            //packets_db.Add(0x0040, new Packet() { name = "TS_LOGIN_RESULT", func = GamePackets.TS_LOGIN_RESULT });
+            //packets_db.Add(0x0041, new Packet() { name = "TS_CS_MOVE_REQUEST", func = GamePackets.TS_CS_MOVE_REQUEST });
+
+            packets_db.Add(0x0064, new Packet() { name = "parse_PCAttack", func = GamePackets.parse_PCAttack });
 			packets_db.Add(0x0065, new Packet() { name = "send_Attack", func = GamePackets.send_Attack });
 
 			packets_db.Add(0x00C8, new Packet() { name = "parse_Equip", func = GamePackets.parse_Equip });
@@ -103,7 +110,7 @@ namespace RappelzSniffer.Network
 
 			packets_db.Add(0x0226, new Packet() { name = "parse_226", func = GamePackets.parse_226 });
 
-			packets_db.Add(0x0384, new Packet() { name = "parse_384", func = GamePackets.parse_384 });
+			packets_db.Add(0x0384, new Packet() { name = "TS_CS_CHANGE_LOCATION", func = GamePackets.TS_CS_CHANGE_LOCATION });
 			packets_db.Add(0x0385, new Packet() { name = "TS_SC_CHANGE_LOCATION", func = GamePackets.TS_SC_CHANGE_LOCATION });
 			packets_db.Add(0x0386, new Packet() { name = "TS_SC_WEATHER_INFO", func = GamePackets.TS_SC_WEATHER_INFO });
 

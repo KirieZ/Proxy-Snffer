@@ -215,24 +215,27 @@ namespace RappelzSniffer.Network
 
         internal static void TS_AC_RESULT_WITH_STRING(ref PacketStream pStream)
         {
-            //struct TS_AC_RESULT_WITH_STRING : public TS_MESSAGE_WNA
-            //{
-	           // enum LOGIN_SUCCESS_FLAG
+            // enum LOGIN_SUCCESS_FLAG
             //        {
             //            LSF_EULA_ACCEPTED = 0x1,
             //            LSF_ACCOUNT_BLOCK_WARNING = 0x2,
             //            LSF_DISTRIBUTION_CODE_REQUIRED = 0x4
             //        };
 
-            //        uint16_t request_msg_id;
-            //        uint16_t result;
-            //        int32_t login_flag;
-            //        int32_t strSize;
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("struct TS_AC_RESULT_WITH_STRING [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
 
-            //        char string[0];
+            str.Append("{\r\n");
+            str.Append("	ushort request_msg_id = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            str.Append("	ushort result = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            str.Append("	int login_flag = ").Append(pStream.ReadInt32()).Append("\r\n");
+            int strSize = pStream.ReadInt32();
+            str.Append("	ushort strSize = ").Append(strSize).Append("\r\n");
+            str.Append("    char string[0] = ").Append(pStream.ReadString(0, strSize)).Append("\r\n");
+            str.Append("}");
 
-	           // static const uint16_t packetID = 10002;
-            //    };
+            Form1.PacketRecv('A', "TS_AC_RESULT_WITH_STRING", pStream, str.ToString());
         }
         
         internal static void TS_CA_IMBC_ACCOUNT(ref PacketStream pStream)
@@ -257,14 +260,34 @@ namespace RappelzSniffer.Network
             //        unsigned short size;
             //    };
             //};
+
+            //StringBuilder str = new StringBuilder();
+            //str.AppendLine("struct TS_CA_IMBC_ACCOUNT [").Append(pStream.GetId()).Append("]\r\n");
+            //pStream.ReadByte();
+
+            //str.Append("{\r\n");
+            //str.Append("	ushort request_msg_id = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            //str.Append("	ushort result = ").Append(pStream.ReadUInt16()).Append("\r\n");
+            //str.Append("	int login_flag = ").Append(pStream.ReadInt32()).Append("\r\n");
+            //int strSize = pStream.ReadInt32();
+            //str.Append("	ushort strSize = ").Append(strSize).Append("\r\n");
+            //str.Append("    char string[0] = ").Append(pStream.ReadString(0, strSize)).Append("\r\n");
+            //str.Append("}");
+
+            //Form1.PacketSend('A', "TS_CA_IMBC_ACCOUNT", pStream, str.ToString());
+
         }
 
         internal static void TS_CA_DISTRIBUTION_INFO(ref PacketStream pStream)
         {
-            // struct TS_CA_DISTRIBUTION_INFO : public TS_MESSAGE
-            //{
-	           // static const uint16_t packetID = 10026;
-            //    };
+            StringBuilder str = new StringBuilder();
+            str.Append("struct TS_CA_DISTRIBUTION_INFO [").Append(pStream.GetId()).Append("]\r\n");
+            pStream.ReadByte();
+
+            str.Append("{\r\n");
+            str.Append("}");
+
+            Form1.PacketSend('A', "TS_CA_DISTRIBUTION_INFO", pStream, str.ToString());
         }
 
         #endregion
